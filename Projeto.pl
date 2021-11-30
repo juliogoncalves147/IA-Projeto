@@ -50,6 +50,7 @@ encomenda(2,bilhetes,17,10,60).
 encomenda(3,telemovel,12,67,250).
 encomenda(4,livro,77,18,27).
 encomenda(5,computador,2,2,1500).
+encomenda(6,coluna, 1.5, 4, 30).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega
@@ -57,8 +58,9 @@ encomenda(5,computador,2,2,1500).
 entrega(4,2/10/2021,2,13,bicicleta).
 entrega(2,3/10/2021,3,1,moto).
 entrega(1,4/11/2021,1,2,moto).
-entrega(3,7/11/2021,5,3,carro).
-entrega(5,17/1/2020,4,2,moto).
+entrega(3,7/11/2021,6,3,carro).
+entrega(5,7/11/2021,4,2,moto).
+entrega(6,3/10/2021,5,7,bicicleta).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Estafeta
@@ -108,18 +110,65 @@ listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 2 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-
 % Apresenta uma lista dos estafetas que entregaram uma encomenda a um determinado cliente
 % Extensão do predicado estafetaCliente: Nome cliente, Lista -> {V,F}
 
-estafetaCliente(Cliente, L) :- solucoes(ID, cliente(Cliente, ID, Classificacao), S), diferentes(S, S1),
+estafetaCliente(NomeCliente, L) :- solucoes(ID, cliente(NomeCliente, ID, Classificacao), S), diferentes(S, S1),
 							   estafetaClienteAux(S1, L).
 
 estafetaClienteAux([], []).							
 estafetaClienteAux([ID|T] , L) :- solucoes(Nome, estafeta(Nome, ID), R1), estafetaClienteAux(T, R2), concatenar(R1, R2, L).
 
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 3 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista dos clientes servidos por um determinado estafeta
+% Extensão do predicado estafetaCliente: Nome cliente, Lista -> {V,F}
 
+clienteEstafeta(NomeEstafeta, L) :- solucoes(ID, estafeta(NomeEstafeta, ID), S), diferentes(S, S1),
+								clienteEstafetaAux(S1, L).
+
+clienteEstafetaAux([],[]).
+clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, Classificacao), R1), clienteEstafetaAux(T, R2), concatenar(R1,R2,S), diferentes(S,L).
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 4 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta a faturação da empresa num determinado dia
+% Extensão do predicado estafetaCliente: Data, Variável -> {V,F}
+fatura(Data, L) :- solucoes(IdEncomenda, entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), S), diferentes(S, S1),
+				 faturaAux(S1, S2), somaC(S2,L).
+
+faturaAux([],[]).
+faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, Nome, Peso, Volume, Preco), R1),faturaAux(T,R2), concatenar(R1,R2, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 6 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta a classificacao media de satisfação de um estafeta
+% Extensão do predicado satisfacao: Nome Estafeta, Variável -> {V,F}
+satisfacao(Nome, L) :- solucoes(ID, estafeta(Nome, ID), S), diferentes(S, S1),
+						satisfacaoAux(S1, L1), media(L1, L).
+
+satisfacaoAux([],[]).
+satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(NomeCliente, ID, Classificacao), S), satisfacaoAux(T, S1), concatenar(S,S1, L).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 7 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 8 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 9 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
