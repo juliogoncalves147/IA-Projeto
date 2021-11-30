@@ -108,6 +108,19 @@ listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomen
 listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte), entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), R), diferentes(R, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+estafetaEcologico(L) :- listarEstafetas(R), estafetaEcologicoAux(R,100,L).
+
+estafetaEcologicoAux([], _, L).
+estafetaEcologicoAux([R|T],MIN,L) :- calcula(R, R1),
+									 (R1 < MIN) -> estafetaEcologicoAux(T, R1, R) ; estafetaEcologicoAux(T, MIN, L).
+
+calcula(R, L) :- solucoes(Id, estafeta(R, Id), R1), devolveListaVeiculos(R1, R2), calculaValorEcologico(R2, L).
+
+%% Acabar isto não está a funcionar					 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 2 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista dos estafetas que entregaram uma encomenda a um determinado cliente
@@ -238,3 +251,19 @@ contem(X, [H|T]) :- contem(X, T).
 % Extensao do predicado media: L,R -> {V,F}
 
 media([H|T],S) :- somaC([H|T],S1), comprimento([H|T],S2), S is S1/S2.
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+calculaValorEcologico([T], L) :- valorEcologico(T, L).
+calculaValorEcologico([H|T], L) :- valorEcologico(H,R), calculaValorEcologico(T,RL), L is R+RL.
+
+devolveListaVeiculos([], []).
+devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, Data, IdEncomenda, Prazo, Veiculo), R), devolveListaVeiculos(T,R1), concatenar(R,R1,L).
+
+valorEcologico(bicicleta, L):- L is 1.
+valorEcologico(moto, L):- L is 2.
+valorEcologico(carro, L):- L is 3.
+
+
+
