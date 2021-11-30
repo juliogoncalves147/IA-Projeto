@@ -115,7 +115,7 @@ estafetaEcologico(L) :- listarEstafetas(R), estafetaEcologicoAux(R,100,L).
 
 estafetaEcologicoAux([], _, L).
 estafetaEcologicoAux([R|T],MIN,L) :- calcula(R, R1),
-									 (R1 < MIN) -> estafetaEcologicoAux(T, R1, R) ; estafetaEcologicoAux(T, MIN, L).
+				     (R1 < MIN) -> estafetaEcologicoAux(T, R1, R) ; estafetaEcologicoAux(T, MIN, L).
 
 calcula(R, L) :- solucoes(Id, estafeta(R, Id), R1), devolveListaVeiculos(R1, R2), calculaValorEcologico(R2, L).
 
@@ -264,6 +264,8 @@ devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, Data, IdEncomenda
 valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
+
+
 
 
 
