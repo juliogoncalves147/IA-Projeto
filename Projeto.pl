@@ -1,5 +1,3 @@
-
-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: Declaracoes iniciais
 
@@ -8,53 +6,118 @@
 :- set_prolog_flag( unknown,fail ).					
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: definicoes iniciais
 
 :- op( 900,xfy,'::' ).
 
-
 solucoes(T,Q,S) :- findall(T,Q,S).
-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 evolucao( Termo ) :-
-	solucoes(Invariante,+Termo::Invariante,Lista),
-	insercao(Termo),
-	teste(Lista).
+  solucoes( Invariante,+Termo::Invariante,Lista ),
+    insercao( Termo ), 
+      teste( Lista ).
 
-insercao( Termo ) :- assert( Termo ).
-insercao( Termo ) :- retract( Termo ),!,fail.
-
-teste([]).
-teste( [H|T] ) :- H, teste( T ).
-
-comprimento( [],0 ).
-comprimento( [H|T],R ) :- comprimento( T,N ), R is N+1.
-
-
-
-
+insercao( Termo) :-
+        assert( Termo ).
+insercao( Termo) :-
+        retract( Termo ),!,fail.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
+involucao( Termo ) :-
+    solucoes( Invariante, -Termo::Invariante, Lista ),
+      remocao( Termo ),
+        teste( Lista ).
 
-% -> transporte(peso maximo, velocidade media com esse peso)
-bicicleta(5,10).      
-mota(20,35).            
-carro(100, 25). 
+remocao( Termo ):-
+        retract( Termo ).
+remocao( Termo ):-
+        assert( Termo ),!,fail.
 
-% -> entrega(id, nome, freguesia, peso (Kg), volume (Cm3), prazo(dias))
-entrega(1, brinquedo, gualtar, 10, 5, 3).
-entrega(2, carta, lamacaes, 0.5, 1, 2).
-entrega(3, roupa, prado, 2, 3, 7).
-entrega(4, bilhetes, vila verde, 0.4, 1.1, 4).
-entrega(5, computador, lamacaes, 3.5, 2.2, 6).
-entrega(6, sapatos, maximinos, 1.4, 3.2, 5).
 
-% -> estafeta(nome, id, lista de entregas, meio transporte).
-estafeta(joao, 1, [entrega(1, brinquedo, gualtar, 10, 5, 3), entrega(2, carta, lamacaes, 0.5, 1, 2)], mota(20,35)).
-estafeta(jose, 2, [entrega(3, roupa, prado, 2, 3, 7),entrega(5, computador, lamacaes, 3.5, 2.2, 6)],entrega(4, bilhetes, vila verde, 0.4, 1.1, 4), carro(100,25)).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%----------------------- Base de Conhecimento  - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Encomenda
+% Extensao do predicado encomenda : IdEncomenda, Nome, Peso, Volume, Preço -> { V, F }
+encomenda(1,brinquedo,2,5,50).
+encomenda(2,bilhetes,17,10,60).
+encomenda(3,telemovel,12,67,250).
+encomenda(4,livro,77,18,27).
+encomenda(5,computador,2,2,1500).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Entrega
+% Extensao do predicado entrega : IdEntrega, Data, IdEncomenda, Prazo, Transporte -> { V, F }
+entrega(4,2/10/2021,2,13,bicicleta).
+entrega(2,3/10/2021,3,1,moto).
+entrega(1,4/11/2021,1,2,moto).
+entrega(3,7/11/2021,5,3,carro).
+entrega(5,17/1/2020,4,2,moto).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Estafeta
+% Extensao do predicado estafeta : NomeEstafeta, IdEntrega -> { V, F }
+estafeta(manuel,1).
+estafeta(luis,3).
+estafeta(andre,2).
+estafeta(maria,5).
+estafeta(andre,4).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Cliente
+% Extensao do predicado cliente : NomeCliente, IdEntrega, Classificacao -> { V, F }
+cliente(joao,1,3).
+cliente(joaquim,5,3).
+cliente(joao,2,2).
+cliente(martim,3,5).
+cliente(daniel,4,5).
+
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%-----------------------------	PREDICADOS	- - - - -  - - - - -  -  -  
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos os estafetas da empresa
+% Extensão do predicado listarEstafetas: Lista -> {V,F}
+listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, ID), R), diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos os clientes da empresa
+% Extensão do predicado listarCliente: Lista -> {V,F}
+listarCliente( L ) :- solucoes(Nome, cliente(Nome, IdEntrega, Classificacao), R), diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos as encomendas da empresa
+% Extensão do predicado listarEncomendas: Lista -> {V,F}
+listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda), encomenda(IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda), R), diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos as entregas da empresa
+% Extensão do predicado listarEntregas: Lista -> {V,F}
+listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte), entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), R), diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 2 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+% Apresenta uma lista dos estafetas que entregaram uma encomenda a um determinado cliente
+% Extensão do predicado estafetaCliente: Nome cliente, Lista -> {V,F}
+
+estafetaCliente(Cliente, L) :- solucoes(ID, cliente(Cliente, ID, Classificacao), S), diferentes(S, S1),
+							   estafetaClienteAux(S1, L).
+
+estafetaClienteAux([], []).							
+estafetaClienteAux([ID|T] , L) :- solucoes(Nome, estafeta(Nome, ID), R1), estafetaClienteAux(T, R2), concatenar(R1, R2, L).
+
 
 
 
