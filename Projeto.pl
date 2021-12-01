@@ -1,10 +1,6 @@
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: Declaracoes iniciais
 
-:- set_prolog_flag(discontiguous_warnings,off).
-:- set_prolog_flag(single_var_warnings,off).
-:- set_prolog_flag(unknown,fail).					
-
 :- dynamic encomenda/5.
 :- dynamic entrega/5.
 :- dynamic estafeta/2.
@@ -302,9 +298,8 @@ valorEcologico(carro, L):- L is 3.
 %--------------------------------- Encomenda - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % IdEncomenda, Freguesia, Peso, Volume, Preço
-+encomenda(IdEncomenda,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_)), R), 
++encomenda(IdEncomenda,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_)), R), 
                                    comprimento(R, L), L == 1).
-
 
 +encomenda(_,_,Peso,_,_) :: (solucoes((Peso), (encomenda(_,_,Peso,_,_)), R), 
                             naoNegativoLista(R)).
@@ -318,7 +313,12 @@ valorEcologico(carro, L):- L is 3.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Entrega -  - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% IdEntrega, Data, IdEncomenda, Prazo, Transporte
 
++entrega(IdEntrega,_,_,_,_) :: (solucoes(IdEntrega), (encomenda(IdEntrega,_,_,_,_)), R),
+                                comprimento(R, L), L == 1).
+
++entrega(_,Data,_,_,_) :: 
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Estafeta - - - - - -  -  -  -  -  -
