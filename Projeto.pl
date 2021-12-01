@@ -50,7 +50,8 @@ concluido(5, 4, date(2021,11,8)).
 concluido(7, 7, date(2021,6,9)).
 concluido(6, 5, date(2021,6,9)).
 concluido(3, 6, date(2021,11,12)).
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+concluido(9, 9, date(2021,6,9)).
+%--------------------------------- - - - - - - - - - -  -  -s  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
@@ -62,6 +63,7 @@ encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
 encomenda(7, prado,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
+encomenda(9, braga, 20, 2, 21, finalizada).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
@@ -73,8 +75,8 @@ entrega( 3, date(2021,11,7), 6, 3, carro).
 entrega( 5, date(2021,11,7), 4, 2, moto).
 entrega( 6, date(2021, 6,6), 5, 7, bicicleta).
 entrega( 7, date(2021, 6,4), 7, 8, carro).
-entrega( 8, date(2021,9,10), 8, 5, carro).
-
+entrega( 8, date(2021 9,10), 8, 5, carro).
+entrega( 9, date(2021, 6,1), 9, 20, carro)
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Estafeta
@@ -87,6 +89,7 @@ estafeta(andre,4).
 estafeta(maria,7).
 estafeta(andre,6).
 estafeta(luis,8).
+estafeta(andre,9).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Cliente
@@ -99,6 +102,7 @@ cliente(daniel, 4,5).
 cliente(ze, 8, 4).
 cliente(joao,6, 3.5).
 cliente(martim, 7, 2).
+cliente(ze, 9, 2).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -300,7 +304,7 @@ pesoTransportado(X, L) :- listarEstafetas(T), procura(T, X, L).
 
 % Dada uma lista de estafetas, calcula o peso que cada um carregava recursivamente
 procura([],_,[]).
-procura([R|T], X, [R/F|L]) :-  calculaIdsEstafeta(R, X, F), procura(T, X, L).
+procura([R|T], X, [R/F|L]) :-  calculaIdsEntrega(R, X, F), procura(T, X, L).
 
 % Dado o nome de um estafeta, calcula todos os IdEntrega associados a ele
 calculaIdsEntrega(R, X, L) :- solucoes(IdEntrega, estafeta(R,IdEntrega), T), calculaIdsEncomenda(T, X, L).
