@@ -186,6 +186,17 @@ satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(NomeCliente, ID, Cla
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 7 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta o número total de entregas pelo diferentes meios de transporte num determinado intervalo de tempo
+% Extensão do predicado totalEntregasVeiculo: DataI, DataF, Bicicleta/Moto/Carro -> {V,F}
+
+totalEntregasVeiculo(D1,D2,B/M/C).
+
+totalEntregasIntervaloTempo(D1,D2,L) :- listarEntregas( Entregas ), totalEntregasIntervaloTempoAux(D1,D2,Entregas,L).
+totalEntregasIntervaloTempoAux(_,_,[],[]).
+totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T1]) :- 
+        antesDe(Data,D2),depoisDe(Data,D1),!,totalEntregasIntervaloTempoAux(D1,D2,T,T1).
+totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],T1) :-
+        totalEntregasIntervaloTempoAux(D1,D2,T,T1).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 8 - - - - - -  -  -  -  -   -
@@ -286,7 +297,6 @@ devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, _, _, _, Veiculo)
 valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
-
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
