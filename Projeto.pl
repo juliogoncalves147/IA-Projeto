@@ -1,9 +1,14 @@
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: Declaracoes iniciais
 
-:- set_prolog_flag( discontiguous_warnings,off ).
-:- set_prolog_flag( single_var_warnings,off ).
-:- set_prolog_flag( unknown,fail ).					
+:- set_prolog_flag(discontiguous_warnings,off).
+:- set_prolog_flag(single_var_warnings,off).
+:- set_prolog_flag(unknown,fail).					
+
+:- dynamic encomenda/5.
+:- dynamic entrega/5.
+:- dynamic estafeta/2.
+:- dynamic cliente/3.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -50,7 +55,7 @@ encomenda(2,maximinos,17,10,60).
 encomenda(3,prado,12,67,250).
 encomenda(4,lamacaes,77,18,27).
 encomenda(5,gualtar,2,2,1500).
-encomenda(6,lomar, 1.5, 4, 30).
+encomenda(6,lomar,1.5, 4, 30).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega
@@ -195,7 +200,7 @@ satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(NomeCliente, ID, Cla
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- QUERY 10 - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 10 - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -251,8 +256,14 @@ teste([I|L]) :- I, teste(L).
 % Verifica se todos os elementos da lista são não negativos
 % Extensao do predicado naoNegativo: L -> {V,F}  
 
-naoNegativo([]).
-naoNegativo([H|T]) :- H>=0, naoNegativo(T).
+naoNegativoLista([]).
+naoNegativoLista([H|T]) :- H >=0, naoNegativoLista(T).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Verifica se todos os elementos da lista são não negativos
+% Extensao do predicado naoNegativo: L -> {V,F}  
+
+naoNegativo(L) :- L >=0.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Verifica se contem um elemento numa dado lista
@@ -279,3 +290,41 @@ devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, _, _, _, Veiculo)
 valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%----------------------------- Invariantes - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- Encomenda - - - - -  -  -  -  -  -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% IdEncomenda, Freguesia, Peso, Volume, Preço
++encomenda(IdEncomenda,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_)), R), 
+                                   comprimento(R, L), L == 1).
+
+
++encomenda(_,_,Peso,_,_) :: (solucoes((Peso), (encomenda(_,_,Peso,_,_)), R), 
+                            naoNegativoLista(R)).
+
++encomenda(_,_,_,Volume,_) :: (solucoes((Volume), (encomenda(_,_,_,Volume,_)), R), 
+                            naoNegativoLista(R)).
+
++encomenda(_,_,_,_,Preco) :: (solucoes((Preco), (encomenda(_,_,_,_,Preco)), R), 
+                            naoNegativoLista(R)).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- Entrega -  - - - - -  -  -  -  -  -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- Estafeta - - - - - -  -  -  -  -  -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- Cliente  - - - - - -  -  -  -  -  -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
