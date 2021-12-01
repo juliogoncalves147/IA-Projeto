@@ -426,13 +426,13 @@ testaPesoTransporte(L, bicicleta) :- L =< 5 .
 testaClassificacao(L) :- L >= 0, L =< 5.
 
 % Predicados sobre Datas
-antesDe(D1/M1/A1,D2/M2/A2) :- A1 < A2.
-antesDe(D1/M1/A1,D2/M2/A1) :- M1 < M2.
-antesDe(D1/M1/A1,D2/M1/A1) :- D1 =< D2.
+antesDe(date(_,_,A1),date(_,_,A2)) :- A1 < A2.
+antesDe(date(_,M1,A1),date(_,M2,A1)) :- M1 < M2.
+antesDe(date(D1,M1,A1),date(D2,M1,A1)) :- D1 =< D2.
 
-depoisDe(D1/M1/A1,D2/M2/A2) :- A1 > A2.
-depoisDe(D1/M1/A1,D2/M2/A1) :- M1 > M2.
-depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
+depoisDe(date(_,_,A1),date(_,_,A2)) :- A1 > A2.
+depoisDe(date(_,M1,A1),date(_,M2,A1)) :- M1 > M2.
+depoisDe(date(D1,M1,A1),date(D2,M1,A1)) :- D1 >= D2.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
