@@ -158,12 +158,12 @@ faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, Nome, Peso, Volume, Preco)
 %--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
-freguesiaPlus(L) :- solucoes(Freguesia, encomenda(IdEncomenda, Freguesia, Peso, Volume, Preco), R), freguesiaPlusAux(R,0, L).
+freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(IdEncomenda, Freguesia, Peso, Volume, Preco), R), freguesiaPlusAux(R,0, L, Final).
 
-freguesiaPlusAux([], _, L).     
-freguesiaPlusAux([R|T],N, L) :-  count(R, [R|T], N1),
-                                 N1 > N -> removeAll(R, [R|T], S),  freguesiaPlusAux(S, N1, R) 
-                                 ; removeAll(R, [R|T], S), freguesiaPlusAux(S, N, L).
+freguesiaPlusAux([], _, L, L).     
+freguesiaPlusAux([R|T],N, L, Final) :-  count(R, [R|T], N1),
+                                 N1 > N -> removeAll(R, [R|T], S),  freguesiaPlusAux(S, N1, R, Final) 
+                                 ; removeAll(R, [R|T], S), freguesiaPlusAux(S, N, L, Final).
 
 removeAll(_, [], []).
 removeAll(X, [X|T], L):- removeAll(X, T, L), !.
