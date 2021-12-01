@@ -80,20 +80,18 @@ cliente(joao,2,2).
 cliente(martim,3,5).
 cliente(daniel,4,5).
 
-
-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %-----------------------------	PREDICADOS	- - - - -  - - - - -  -  -  
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista de todos os estafetas da empresa
 % Extensão do predicado listarEstafetas: Lista -> {V,F}
-listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, ID), R), diferentes(R, L).
+listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, _), R), diferentes(R, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista de todos os clientes da empresa
 % Extensão do predicado listarCliente: Lista -> {V,F}
-listarCliente( L ) :- solucoes(Nome, cliente(Nome, IdEntrega, Classificacao), R), diferentes(R, L).
+listarCliente( L ) :- solucoes(Nome, cliente(Nome, _, _), R), diferentes(R, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -113,7 +111,8 @@ listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte
 
 estafetaEcologico(L) :- listarEstafetas(R), estafetaEcologicoAux(R,100,L).
 
-estafetaEcologicoAux([], _, L).
+estafetaEcologicoAux([], _, _).
+estafetaEcologicoAux([X],_,X).
 estafetaEcologicoAux([R|T],MIN,L) :- calcula(R, R1),
 				     (R1 < MIN) -> estafetaEcologicoAux(T, R1, R) ; estafetaEcologicoAux(T, MIN, L).
 
@@ -277,13 +276,8 @@ calculaValorEcologico([T], L) :- valorEcologico(T, L).
 calculaValorEcologico([H|T], L) :- valorEcologico(H,R), calculaValorEcologico(T,RL), L is R+RL.
 
 devolveListaVeiculos([], []).
-devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, Data, IdEncomenda, Prazo, Veiculo), R), devolveListaVeiculos(T,R1), concatenar(R,R1,L).
+devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, _, _, _, Veiculo), R), devolveListaVeiculos(T,R1), concatenar(R,R1,L).
 
 valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
-
-
-
-
-
