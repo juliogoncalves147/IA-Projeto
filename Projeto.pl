@@ -44,13 +44,13 @@ remocao( Termo ):-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
-% Extensao do predicado encomenda : IdEncomenda, Nome, Peso, Volume, Preço -> { V, F }
-encomenda(1,brinquedo,2,5,50).
-encomenda(2,bilhetes,17,10,60).
-encomenda(3,telemovel,12,67,250).
-encomenda(4,livro,77,18,27).
-encomenda(5,computador,2,2,1500).
-encomenda(6,coluna, 1.5, 4, 30).
+% Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço -> { V, F }
+encomenda(1,prado,2,5,50).
+encomenda(2,maximinos,17,10,60).
+encomenda(3,prado,12,67,250).
+encomenda(4,lamacaes,77,18,27).
+encomenda(5,gualtar,2,2,1500).
+encomenda(6,lomar, 1.5, 4, 30).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega
@@ -161,8 +161,22 @@ faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, Nome, Peso, Volume, Preco)
 %--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
+freguesiaPlus(L) :- solucoes(Freguesia, encomenda(IdEncomenda, Freguesia, Peso, Volume, Preco), R), freguesiaPlusAux(R,0, L).
+
+freguesiaPlusAux([], _, L).     
+freguesiaPlusAux([R|T],N, L) :-  count(R, [R|T], N1),
+                                 N1 > N -> removeAll(R, [R|T], S),  freguesiaPlusAux(S, N1, R) 
+                                 ; removeAll(R, [R|T], S), freguesiaPlusAux(S, N, L).
+
+removeAll(_, [], []).
+removeAll(X, [X|T], L):- removeAll(X, T, L), !.
+removeAll(X, [H|T], [H|L]):- removeAll(X, T, L ).
+
+count(_, [], 0).
+count(X, [X | T], N) :- !, count(X, T, N1), N is N1 + 1.
+count(X, [_ | T], N) :- count(X, T, N).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- QUERY 6 - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 6 -0 - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a classificacao media de satisfação de um estafeta
 % Extensão do predicado satisfacao: Nome Estafeta, Variável -> {V,F}
@@ -181,6 +195,10 @@ satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(NomeCliente, ID, Cla
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 9 - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 10 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
