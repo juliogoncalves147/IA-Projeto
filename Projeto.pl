@@ -48,7 +48,8 @@ remocao( Termo ):-
 % Extensao do predicado concluido : IdEntrega, IdEncomenda, DataConcluida -> { V, F }
 concluido(5, 4, date(2021,11,8)).
 concluido(7, 7, date(2021,6,9)).
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+concluido(6, 5, date(2021,6,9)).
+%--------------------------------- - - - - - - - - - -  -  -s  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
@@ -56,7 +57,7 @@ encomenda(1, prado,     15,   5,  50,   pendente).
 encomenda(2, maximinos, 3,  10, 60,   caminho).
 encomenda(3, prado,     12,  67, 250,  pendente).             
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
-encomenda(5, gualtar,   2,   2,  1500, pendente).
+encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
 encomenda(7, prado,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
@@ -69,8 +70,8 @@ entrega( 2, date(2021,10,3), 3, 1, moto).
 entrega( 1, date(2021,11,4), 1, 2, moto).
 entrega( 3, date(2021,11,7), 6, 3, carro). 
 entrega( 5, date(2021,11,7), 4, 2, moto).
-entrega( 6, date(2021,10,3), 5, 7, bicicleta).
-entrega( 7, date(2021,6 ,4), 7, 8, carro).
+entrega( 6, date(2021, 6,6), 5, 7, bicicleta).
+entrega( 7, date(2021, 6,4), 7, 8, carro).
 entrega( 8, date(2021,9,10), 8, 5, carro).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -283,7 +284,26 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 10 - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Devolve uma lista com os estafetas e o peso que cada um leva numa data em que se entregaram encomendas.
+% Extensao do predicado peso transportado: Data, Variavel -> {V,F}
+pesoTransportado(X, L) :- listarEstafetas(T), procura(T, X, L). 
 
+% Dada uma lista de estafetas, calcula o peso que cada um carregava recursivamente
+procura([],_,[]).
+procura([R|T], X, [R/F|L]) :-  calculaIdsEstafeta(R, X, F), procura(T, X, L).
+
+% Dado o nome de um estafeta, calcula todos os IdEntrega associados a ele
+calculaIdsEntrega(R, X, L) :- solucoes(IdEntrega, estafeta(R,IdEntrega), T), calculaIdsEncomenda(T, X, L).
+
+% Dado uma lista de IdsEntrega, verifica a data -> devolve o peso, faz a recursiva
+calculaIdsEncomenda([], _, 0).
+calculaIdsEncomenda([R|T], X, L) :-  \+ (concluido(R, IdEncomenda, X)) , calculaIdsEncomenda(T, X, L).
+calculaIdsEncomenda([R|T], X, L) :- concluido(R, IdEncomenda, X), calculaPeso(IdEncomenda,F), 
+                                    calculaIdsEncomenda(T, X, R1), L is R1 + F.
+
+% Dado um IdEncomenda devolve o Peso associado
+calculaPeso(R, Peso) :- encomenda(R,_,Peso,_,_,_). 
+calculaPeso(_,0).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %---------------------- Predicados Auxiliares  - - - -  -  -  -  -   -
@@ -310,6 +330,7 @@ removerElemento( [X|L],Y,[X|NL] ) :- X \== Y, removerElemento( L,Y,NL ).
 % Soma os elementos de uma lista
 % Extensao do predicado somaC : LN,R -> {V,F}
 
+somaC([],0).
 somaC([X],X).
 somaC([X|L],R):- somaC(L,RL), R is X+RL.
 
