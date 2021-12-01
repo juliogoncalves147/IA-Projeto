@@ -54,14 +54,14 @@ encomenda(5,gualtar,2,2,1500).
 encomenda(6,lomar,1.5, 4, 30).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Entrega
+% Entrega       
 % Extensao do predicado entrega : IdEntrega, Data, IdEncomenda, Prazo, Transporte -> { V, F }
-entrega(4,2/10/2021,2,13,bicicleta).
-entrega(2,3/10/2021,3,1,moto).
-entrega(1,4/11/2021,1,2,moto).
-entrega(3,7/11/2021,6,3,carro).
-entrega(5,7/11/2021,4,2,moto).
-entrega(6,3/10/2021,5,7,bicicleta).
+entrega(4,date(2021,10,2),2,13,bicicleta).
+entrega(2,date(2021,10,3),3,1,moto).
+entrega(1,date(2021,11,4),1,2,moto).
+entrega(3,date(2021,11,7),6,3,carro).
+entrega(5,date(2021,11,7),4,2,moto).
+entrega(6,date(2021,10,3),5,7,bicicleta).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Estafeta
@@ -110,7 +110,7 @@ listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
-estafetaEcologico(FINAL) :- listarEstafetas(R), estafetaEcologicoAux(R,100,L,FINAL).
+estafetaEcologico(FINAL) :- listarEstafetas(R), estafetaEcologicoAux(R,100,_,FINAL).
 
 estafetaEcologicoAux([],_,L,L).
 estafetaEcologicoAux([R|T],MIN,L,FINAL) :- calcula(R, R1),
@@ -124,7 +124,7 @@ calcula(R, L) :- solucoes(Id, estafeta(R, Id), R1), devolveListaVeiculos(R1, R2)
 % Apresenta uma lista dos estafetas que entregaram uma encomenda a um determinado cliente
 % Extensão do predicado estafetaCliente: Nome cliente, Lista -> {V,F}
 
-estafetaCliente(NomeCliente, L) :- solucoes(ID, cliente(NomeCliente, ID, Classificacao), S), diferentes(S, S1),
+estafetaCliente(NomeCliente, L) :- solucoes(ID, cliente(NomeCliente, ID, _), S), diferentes(S, S1),
 							   estafetaClienteAux(S1, L).
 
 estafetaClienteAux([], []).							
@@ -141,7 +141,7 @@ clienteEstafeta(NomeEstafeta, L) :- solucoes(ID, estafeta(NomeEstafeta, ID), S),
 								clienteEstafetaAux(S1, L).
 
 clienteEstafetaAux([],[]).
-clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, Classificacao), R1), clienteEstafetaAux(T, R2), concatenar(R1,R2,S), diferentes(S,L).
+clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, _), R1), clienteEstafetaAux(T, R2), concatenar(R1,R2,S), diferentes(S,L).
 
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -149,17 +149,17 @@ clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, Classificacao),
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a faturação da empresa num determinado dia
 % Extensão do predicado estafetaCliente: Data, Variável -> {V,F}
-fatura(Data, L) :- solucoes(IdEncomenda, entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), S), diferentes(S, S1),
+fatura(Data, L) :- solucoes(IdEncomenda, entrega(_, Data, IdEncomenda,_, _), S), diferentes(S, S1),
 				 faturaAux(S1, S2), somaC(S2,L).
 
 faturaAux([],[]).
-faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, Nome, Peso, Volume, Preco), R1),faturaAux(T,R2), concatenar(R1,R2, L).
+faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, _, _, _, Preco), R1),faturaAux(T,R2), concatenar(R1,R2, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
-freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(IdEncomenda, Freguesia, Peso, Volume, Preco), R), freguesiaPlusAux(R,0, L, Final).
+freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(_,Freguesia,_,_,_), R), freguesiaPlusAux(R,0,_, Final).
 
 freguesiaPlusAux([], _, L, L).     
 freguesiaPlusAux([R|T],N, L, Final) :-  count(R, [R|T], N1),
@@ -182,7 +182,7 @@ satisfacao(Nome, L) :- solucoes(ID, estafeta(Nome, ID), S), diferentes(S, S1),
 						satisfacaoAux(S1, L1), media(L1, L).
 
 satisfacaoAux([],[]).
-satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(NomeCliente, ID, Classificacao), S), satisfacaoAux(T, S1), concatenar(S,S1, L).
+satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(_, ID, Classificacao), S), satisfacaoAux(T, S1), concatenar(S,S1, L).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 7 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -267,7 +267,7 @@ concatenar( [H|T],L2,[H|L] ) :- concatenar(T,L2,L).
 % Extensao do predicado comprimento: L,R -> {V,F}       
 
 comprimento([],0).
-comprimento([H|T],R) :- comprimento(T,N), R is N+1.
+comprimento([_|T],R) :- comprimento(T,N), R is N+1.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Testa todos os elementos da lista
@@ -293,8 +293,8 @@ naoNegativo(L) :- L >=0.
 % Verifica se contem um elemento numa dado lista
 % Extensão do predicado contem: H,[H|T] -> {V, F}
 
-contem(H, [H|T]).
-contem(X, [H|T]) :- contem(X, T).
+contem(H, [H|_]).
+contem(X, [_|T]) :- contem(X, T).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Faz a media de uma lista
@@ -315,6 +315,23 @@ valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
 
+
+testaTransporte(bicicleta).
+testaTransporte(moto).
+testaTransporte(carro).
+
+testaData(date(Y,M,D)) :- Y > 2000, Y < 2025, M > 0, M < 13, D > 0, D < 32.
+
+testaClassificacao(L) :- L >= 0, L =< 5.
+
+% Predicados sobre Datas
+antesDe(D1/M1/A1,D2/M2/A2) :- A1 < A2.
+antesDe(D1/M1/A1,D2/M2/A1) :- M1 < M2.
+antesDe(D1/M1/A1,D2/M1/A1) :- D1 =< D2.
+
+depoisDe(D1/M1/A1,D2/M2/A2) :- A1 > A2.
+depoisDe(D1/M1/A1,D2/M2/A1) :- M1 > M2.
+depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %----------------------------- Invariantes - - - - - -  -  -  -  -   -
@@ -324,42 +341,61 @@ valorEcologico(carro, L):- L is 3.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Encomenda - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% IdEncomenda, Freguesia, Peso, Volume, Preço
+% Invariante Estrutural -> não permite a inserção caso já exista uma encomenda com esse IdEncomenda
 +encomenda(IdEncomenda,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_)), R), 
                                    comprimento(R, L), L == 1).
 
-+encomenda(_,_,Peso,_,_) :: (solucoes((Peso), (encomenda(_,_,Peso,_,_)), R), 
-                            naoNegativoLista(R)).
+% Invariante Estrutural -> não permite a inserção caso seja dado um Peso negativo
++encomenda(_,_,Peso,_,_) :: naoNegativo(Peso).
 
-+encomenda(_,_,_,Volume,_) :: (solucoes((Volume), (encomenda(_,_,_,Volume,_)), R), 
-                            naoNegativoLista(R)).
+% Invariante Estrutural -> não permite a inserção caso seja dado um Volume negativo
++encomenda(_,_,_,Volume,_) :: naoNegativo(Volume).
 
-+encomenda(_,_,_,_,Preco) :: (solucoes((Preco), (encomenda(_,_,_,_,Preco)), R), 
-                            naoNegativoLista(R)).
+% Invariante Estrutural -> não permite a inserção caso seja inserido um preço negativo
++encomenda(_,_,_,_,Preco) :: naoNegativo(Preco).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Entrega -  - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% IdEntrega, Data, IdEncomenda, Prazo, Transporte
-
-+entrega(IdEntrega,_,_,_,_) :: ((solucoes(IdEntrega), (encomenda(IdEntrega,_,_,_,_)), R),
+% Invariante Estrutural -> não permite a inserção caso já exista uma entrega associado a esse IdEntrega
++entrega(IdEntrega,_,_,_,_) :: (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), R),
                                 comprimento(R, L), L == 1).
 
-+entrega(_,Data,_,_,_) :: 
+% Invariante Estrutural -> não permite a inserção caso a data seja inválida
++entrega(_,date(Y,M,D),_,_,_) :: testaData(date(Y,M,D)).      
+
+% Invariante Estrutural -> não permite a inserção caso o prazo seja negativo
++entrega(_,_,_,Prazo,_) :: naoNegativo(Prazo).
+
+% Invariante Estrutural -> não permite a inserção caso já existe uma entrega associada a uma encomenda
++entrega(_,_,IdEncomenda,_,_) :: (solucoes((IdEncomenda), (entrega(_,_,IdEncomenda,_,_)), S),
+                                 comprimento(S,L), L == 1).
+
+% Invariante Estrutural -> não permite a inserção caso não exista uma encomenda associada a esse IdEncomenda
++entrega(_,_,IdEncomenda,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_)), S),
+                                 comprimento(S,L), L == 1).         
+
+% Invariante Estrutural -> não permite a inserção caso não seja inserido um meio de transporte válido
++entrega(_,_,_,_,Transporte) :: testaTransporte(Transporte).    
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Estafeta - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Invariante Estrutural -> não permite a inserção de um estafeta associado a uma entrega que não existe
++estafeta(_, IdEntrega) :: (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), S),
+                                 comprimento(S,L), L == 1).
 
+% Invariante Estrutural -> não permite a inserção de um estafeta associado a uma entrega que já estava associada a outro estafeta
++estafeta(_, IdEntrega) :: (solucoes((IdEntrega), (estafeta(_, IdEntrega)), S),
+                                 comprimento(S,L), L == 1).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Cliente  - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Predicados sobre Datas
-antesDe(D1/M1/A1,D2/M2/A2) :- A1 < A2.
-antesDe(D1/M1/A1,D2/M2/A1) :- M1 < M2.
-antesDe(D1/M1/A1,D2/M1/A1) :- D1 =< D2.
+% Invariante Estrutural -> não permite a inserção caso o cliente dê uma classificação não elegivel
++cliente(_,_,L) :- testaClassificacao(L).
 
-depoisDe(D1/M1/A1,D2/M2/A2) :- A1 > A2.
-depoisDe(D1/M1/A1,D2/M2/A1) :- M1 > M2.
-depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
+% Invariante Estrutural -> não permite a inserção caso não seja inserido um meio de transporte válido
++cliente(_,IdEntrega,_) :- (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), S),
+                           comprimento(S,L), L == 1).
+
