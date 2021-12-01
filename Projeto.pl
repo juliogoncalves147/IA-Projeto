@@ -1,10 +1,11 @@
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: Declaracoes iniciais
 
-:- dynamic encomenda/5.
+:- dynamic encomenda/6.
 :- dynamic entrega/5.
 :- dynamic estafeta/2.
 :- dynamic cliente/3.
+:- dynamic concluido/3.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -38,20 +39,25 @@ remocao( Termo ):-
 remocao( Termo ):-
         assert( Termo ),!,fail.
 
-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %----------------------- Base de Conhecimento  - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Concluido - Predicado para dar as encomendas que já foram entregues
+% Extensao do predicado concluido : IdEntrega, IdEncomenda, DataConcluida -> { V, F }
+concluido(5,4, date(2021,11,8)).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
-% Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço -> { V, F }
-encomenda(1,prado,2,5,50).
-encomenda(2,maximinos,17,10,60).
-encomenda(3,prado,12,67,250).
-encomenda(4,lamacaes,77,18,27).
-encomenda(5,gualtar,2,2,1500).
-encomenda(6,lomar,1.5, 4, 30).
+% Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
+encomenda(1,prado,2,5,50,pendente).
+encomenda(2,maximinos,17,10,60,caminho).
+encomenda(3,prado,12,67,250,pendente).             
+encomenda(4,lamacaes,77,18,27,finalizada).
+encomenda(5,gualtar,2,2,1500,pendente).
+encomenda(6,lomar,1.5, 4, 30,caminho).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
@@ -59,7 +65,7 @@ encomenda(6,lomar,1.5, 4, 30).
 entrega(4,date(2021,10,2),2,13,bicicleta).
 entrega(2,date(2021,10,3),3,1,moto).
 entrega(1,date(2021,11,4),1,2,moto).
-entrega(3,date(2021,11,7),6,3,carro).
+entrega(3,date(2021,11,7),6,3,carro). 
 entrega(5,date(2021,11,7),4,2,moto).
 entrega(6,date(2021,10,3),5,7,bicicleta).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -92,19 +98,45 @@ listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, _), R), diferentes(R, L).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista de todos os clientes da empresa
 % Extensão do predicado listarCliente: Lista -> {V,F}
-listarCliente( L ) :- solucoes(Nome, cliente(Nome, _, _), R), diferentes(R, L).
+listarCliente( L ) :- solucoes(Nome, cliente(Nome, _, _), R), 
+                      diferentes(R, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista de todos as encomendas da empresa
 % Extensão do predicado listarEncomendas: Lista -> {V,F}
-listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda), encomenda(IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda), R), diferentes(R, L).
+listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda, Estado), 
+                         encomenda(IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda, Estado), R), 
+                         diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Altera o estado de uma encomenda para finalizada e adiciona como concluida na base de conhecimento.
+finalizaEncomenda(L) :- solucoes((L,Freguesia,Peso,Volume,Preco,_), 
+                        encomenda(L,Freguesia,Peso,Volume,Preco,_), [R|T]), 
+                        finalizaEncomendaAuxI(L), 
+                        finalizaEncomendaAuxE(R),
+                        eConcluida(L).
+
+% Faz a involução da encomenda
+finalizaEncomendaAuxI(L) :- involucao(encomenda(L,_,_,_,_,_)).
+% Faz a evolucao da encomenda com o estado atualizado
+finalizaEncomendaAuxE((L,Freguesia,Peso,Volume,Preco,_)) :- evolucao(encomenda(L, Freguesia, Peso, Volume, Preco, finalizado)).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Após uma encomenda ser dado como finalizada, aumenta a base do conhecimento com a conclusão de uma encomenda.
+eConcluida(L) :- solucoes(R,entrega(R,_,L,_,_), [F|T]),
+                 currentDate(D),
+                 evolucao(concluido(F,L,D)).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista de todos as entregas da empresa
 % Extensão do predicado listarEntregas: Lista -> {V,F}
-listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte), entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), R), diferentes(R, L).
+listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte), 
+                       entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), R), 
+                       diferentes(R, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
@@ -123,66 +155,73 @@ calcula(R, L) :- solucoes(Id, estafeta(R, Id), R1), devolveListaVeiculos(R1, R2)
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista dos estafetas que entregaram uma encomenda a um determinado cliente
 % Extensão do predicado estafetaCliente: Nome cliente, Lista -> {V,F}
+estafetaCliente(NomeCliente, L) :- solucoes(ID, cliente(NomeCliente, ID, _), S), 
+                                   diferentes(S, S1),
+				   estafetaClienteAux(S1, L).
 
-estafetaCliente(NomeCliente, L) :- solucoes(ID, cliente(NomeCliente, ID, _), S), diferentes(S, S1),
-							   estafetaClienteAux(S1, L).
-
+% Dado os Ids das Encomenda faz uma lista dos estafetas a que estavam associadas as encomendas
 estafetaClienteAux([], []).							
-estafetaClienteAux([ID|T] , L) :- solucoes(Nome, estafeta(Nome, ID), R1), estafetaClienteAux(T, R2), concatenar(R1, R2, L).
-
+estafetaClienteAux([ID|T] , L) :- solucoes(Nome, estafeta(Nome, ID), R1), 
+                                  estafetaClienteAux(T, R2), 
+                                  concatenar(R1, R2, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 3 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta uma lista dos clientes servidos por um determinado estafeta
 % Extensão do predicado estafetaCliente: Nome cliente, Lista -> {V,F}
-
-clienteEstafeta(NomeEstafeta, L) :- solucoes(ID, estafeta(NomeEstafeta, ID), S), diferentes(S, S1),
-								clienteEstafetaAux(S1, L).
-
+clienteEstafeta(NomeEstafeta, L) :- solucoes(ID, estafeta(NomeEstafeta, ID), S), 
+                                    diferentes(S, S1),
+				    clienteEstafetaAux(S1, L).
+% Dados os Ids das encomendas faz uma lista dos clientes a que estavam associadas as encomendas
 clienteEstafetaAux([],[]).
-clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, _), R1), clienteEstafetaAux(T, R2), concatenar(R1,R2,S), diferentes(S,L).
-
+clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, _), R1), 
+                                 clienteEstafetaAux(T, R2), 
+                                 concatenar(R1,R2,S), 
+                                 diferentes(S,L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 4 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a faturação da empresa num determinado dia
 % Extensão do predicado estafetaCliente: Data, Variável -> {V,F}
-fatura(Data, L) :- solucoes(IdEncomenda, entrega(_, Data, IdEncomenda,_, _), S), diferentes(S, S1),
-				 faturaAux(S1, S2), somaC(S2,L).
+fatura(Data, L) :- solucoes(IdEncomenda, entrega(_, Data, IdEncomenda,_, _), S),
+                   diferentes(S, S1),
+		   faturaAux(S1, S2), somaC(S2,L).
 
+% Dados os Ids das encomentas de um determinado dia calcula a faturação
 faturaAux([],[]).
-faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, _, _, _, Preco), R1),faturaAux(T,R2), concatenar(R1,R2, L).
+faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, _, _, _, Preco,_), R1),
+                        faturaAux(T,R2), 
+                        concatenar(R1,R2, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta a freguesia com maior volume de encomendas
+% Extensão do predicado freguesiaPlus: Variavel -> {V,F}
+freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(_,Freguesia,_,_,_,_), R), freguesiaPlusAux(R,0,_, Final).
 
-freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(_,Freguesia,_,_,_), R), freguesiaPlusAux(R,0,_, Final).
 
 freguesiaPlusAux([], _, L, L).     
 freguesiaPlusAux([R|T],N, L, Final) :-  count(R, [R|T], N1),
-                                 N1 > N -> removeAll(R, [R|T], S),  freguesiaPlusAux(S, N1, R, Final) 
-                                 ; removeAll(R, [R|T], S), freguesiaPlusAux(S, N, L, Final).
-
-removeAll(_, [], []).
-removeAll(X, [X|T], L):- removeAll(X, T, L), !.
-removeAll(X, [H|T], [H|L]):- removeAll(X, T, L ).
-
-count(_, [], 0).
-count(X, [X | T], N) :- !, count(X, T, N1), N is N1 + 1.
-count(X, [_ | T], N) :- count(X, T, N).
+                                         N1 > N -> removeAll(R, [R|T], S), freguesiaPlusAux(S, N1, R, Final) 
+                                                 ; removeAll(R, [R|T], S), freguesiaPlusAux(S, N, L, Final).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 6 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a classificacao media de satisfação de um estafeta
 % Extensão do predicado satisfacao: Nome Estafeta, Variável -> {V,F}
-satisfacao(Nome, L) :- solucoes(ID, estafeta(Nome, ID), S), diferentes(S, S1),
-						satisfacaoAux(S1, L1), media(L1, L).
+satisfacao(Nome, L) :- solucoes(ID, estafeta(Nome, ID), S), 
+                       diferentes(S, S1),
+		       satisfacaoAux(S1, L1), media(L1, L).
 
+% Dado uma lista de Ids de encomendas calcula as classificações dadas pelos clientes.
 satisfacaoAux([],[]).
-satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(_, ID, Classificacao), S), satisfacaoAux(T, S1), concatenar(S,S1, L).
+satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(_, ID, Classificacao), S), 
+                            satisfacaoAux(T, S1), 
+                            concatenar(S,S1, L).
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 7 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -198,9 +237,9 @@ totalEntregasIntervaloTempo(D1,D2,L) :- listarEntregas( Entregas ),
         totalEntregasIntervaloTempoAux(D1,D2,Entregas,L).
         
 totalEntregasIntervaloTempoAux(_,_,[],[]).
-totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T1]) :- 
+totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte, Estado)|T],[(IdEntrega, Data, IdEncomenda, Prazo, Transporte, Estado)|T1]) :- 
         antesDe(Data,D2),depoisDe(Data,D1),!,totalEntregasIntervaloTempoAux(D1,D2,T,T1).
-totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],T1) :-
+totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte, Estado)|T],T1) :-
         totalEntregasIntervaloTempoAux(D1,D2,T,T1).
 
 totalEntregasCarro([],0).
@@ -238,7 +277,8 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 % Extensao do predicado diferentes: L1, L2 -> {V,F}
 
 diferentes( [],[] ).
-diferentes( [X|L],[X|NL] ) :- removerElemento( L,X,TL ), diferentes( TL,NL ).
+diferentes( [X|L],[X|NL] ) :- removerElemento( L,X,TL ), 
+                              diferentes( TL,NL ).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % remove um elemento de uma lista
@@ -300,28 +340,59 @@ contem(X, [_|T]) :- contem(X, T).
 % Faz a media de uma lista
 % Extensao do predicado media: L,R -> {V,F}
 
-media([H|T],S) :- somaC([H|T],S1), comprimento([H|T],S2), S is S1/S2.
+media([H|T],S) :- somaC([H|T],S1), 
+                  comprimento([H|T],S2), S is S1/S2.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Remove os elementos repetidos de uma lista
+removeAll(_, [], []).
+removeAll(X, [X|T], L):- removeAll(X, T, L), !.
+removeAll(X, [H|T], [H|L]):- removeAll(X, T, L ).
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Conta o numero de elementos iguais numa lista
+count(_, [], 0).
+count(X, [X | T], N) :- !, count(X, T, N1), N is N1 + 1.
+count(X, [_ | T], N) :- count(X, T, N).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Calcula o Valor Ecologigo de uma Lista de Transportes
 calculaValorEcologico([T], L) :- valorEcologico(T, L).
-calculaValorEcologico([H|T], L) :- valorEcologico(H,R), calculaValorEcologico(T,RL), L is R+RL.
+calculaValorEcologico([H|T], L) :- valorEcologico(H,R), 
+                                   calculaValorEcologico(T,RL), L is R+RL.
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Dado uma Lista de Ids, devolve a lista de veiculos usados.
 devolveListaVeiculos([], []).
-devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, _, _, _, Veiculo), R), devolveListaVeiculos(T,R1), concatenar(R,R1,L).
+devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, _, _, _, Veiculo), R), 
+                                  devolveListaVeiculos(T,R1), 
+                                  concatenar(R,R1,L).
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Devolve o valor ecologico de cada veiculo.
 valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
 
-
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Testa se um meio de transporte é válido.
 testaTransporte(bicicleta).
 testaTransporte(moto).
 testaTransporte(carro).
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Testa se uma data é valida.
 testaData(date(Y,M,D)) :- Y > 2000, Y < 2025, M > 0, M < 13, D > 0, D < 32.
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Devolve a data atual
+currentDate(Today) :-
+    get_time(Stamp),
+    stamp_date_time(Stamp,DateTime,local),
+    date_time_value(date,DateTime,Today).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% testa se uma classificação é válida.
 testaClassificacao(L) :- L >= 0, L =< 5.
 
 % Predicados sobre Datas
@@ -332,6 +403,7 @@ antesDe(D1/M1/A1,D2/M1/A1) :- D1 =< D2.
 depoisDe(D1/M1/A1,D2/M2/A2) :- A1 > A2.
 depoisDe(D1/M1/A1,D2/M2/A1) :- M1 > M2.
 depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %----------------------------- Invariantes - - - - - -  -  -  -  -   -
@@ -342,17 +414,17 @@ depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
 %--------------------------------- Encomenda - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Invariante Estrutural -> não permite a inserção caso já exista uma encomenda com esse IdEncomenda
-+encomenda(IdEncomenda,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_)), R), 
++encomenda(IdEncomenda,_,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_,_)), R), 
                                    comprimento(R, L), L == 1).
 
 % Invariante Estrutural -> não permite a inserção caso seja dado um Peso negativo
-+encomenda(_,_,Peso,_,_) :: naoNegativo(Peso).
++encomenda(_,_,Peso,_,_,_) :: naoNegativo(Peso).
 
 % Invariante Estrutural -> não permite a inserção caso seja dado um Volume negativo
-+encomenda(_,_,_,Volume,_) :: naoNegativo(Volume).
++encomenda(_,_,_,Volume,_,_) :: naoNegativo(Volume).
 
 % Invariante Estrutural -> não permite a inserção caso seja inserido um preço negativo
-+encomenda(_,_,_,_,Preco) :: naoNegativo(Preco).
++encomenda(_,_,_,_,Preco,_) :: naoNegativo(Preco).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Entrega -  - - - - -  -  -  -  -  -
@@ -372,7 +444,7 @@ depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
                                  comprimento(S,L), L == 1).
 
 % Invariante Estrutural -> não permite a inserção caso não exista uma encomenda associada a esse IdEncomenda
-+entrega(_,_,IdEncomenda,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_)), S),
++entrega(_,_,IdEncomenda,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_,_)), S),
                                  comprimento(S,L), L == 1).         
 
 % Invariante Estrutural -> não permite a inserção caso não seja inserido um meio de transporte válido
