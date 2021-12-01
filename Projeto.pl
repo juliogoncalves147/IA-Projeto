@@ -250,11 +250,14 @@ totalEntregasVeiculo(D1,D2,B/M/C) :- totalEntregasIntervaloTempo(D1,D2,L),
 
 totalEntregasIntervaloTempo(D1,D2,L) :- listarEntregas( Entregas ),
         totalEntregasIntervaloTempoAux(D1,D2,Entregas,L).
-        
+
 totalEntregasIntervaloTempoAux(_,_,[],[]).
-totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte, Estado)|T],[(IdEntrega, Data, IdEncomenda, Prazo, Transporte, Estado)|T1]) :- 
-        antesDe(Data,D2),depoisDe(Data,D1),!,totalEntregasIntervaloTempoAux(D1,D2,T,T1).
-totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte, Estado)|T],T1) :-
+totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, D3, IdEncomenda, Prazo, Transporte)|T],[(IdEntrega, D3, IdEncomenda, Prazo, Transporte)|T1]) :- 
+        antesDe(D3,D2),
+        depoisDe(D3,D1),
+        !,
+        totalEntregasIntervaloTempoAux(D1,D2,T,T1).
+totalEntregasIntervaloTempoAux(D1,D2,[_|T],T1) :-
         totalEntregasIntervaloTempoAux(D1,D2,T,T1).
 
 totalEntregasCarro([],0).
@@ -426,13 +429,13 @@ testaPesoTransporte(L, bicicleta) :- L =< 5 .
 testaClassificacao(L) :- L >= 0, L =< 5.
 
 % Predicados sobre Datas
-antesDe(date(_,_,A1),date(_,_,A2)) :- A1 < A2.
-antesDe(date(_,M1,A1),date(_,M2,A1)) :- M1 < M2.
-antesDe(date(D1,M1,A1),date(D2,M1,A1)) :- D1 =< D2.
+antesDe(date(A1,_,_),date(A2,_,_)) :- A1 < A2,!.
+antesDe(date(A1,M1,_),date(A1,M2,_)) :- M1 < M2,!.
+antesDe(date(A1,M1,D1),date(A1,M1,D2)) :- D1 =< D2.
 
-depoisDe(date(_,_,A1),date(_,_,A2)) :- A1 > A2.
-depoisDe(date(_,M1,A1),date(_,M2,A1)) :- M1 > M2.
-depoisDe(date(D1,M1,A1),date(D2,M1,A1)) :- D1 >= D2.
+depoisDe(date(A1,_,_),date(A2,_,_)) :- A1 > A2,!.
+depoisDe(date(A1,M1,_),date(A1,M2,_)) :- M1 > M2,!.
+depoisDe(date(A1,M1,D1),date(A1,M1,D2)) :- D1 >= D2.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
