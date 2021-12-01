@@ -325,7 +325,7 @@ valorEcologico(carro, L):- L is 3.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % IdEntrega, Data, IdEncomenda, Prazo, Transporte
 
-+entrega(IdEntrega,_,_,_,_) :: (solucoes(IdEntrega), (encomenda(IdEntrega,_,_,_,_)), R),
++entrega(IdEntrega,_,_,_,_) :: ((solucoes(IdEntrega), (encomenda(IdEntrega,_,_,_,_)), R),
                                 comprimento(R, L), L == 1).
 
 +entrega(_,Data,_,_,_) :: 
@@ -338,3 +338,11 @@ valorEcologico(carro, L):- L is 3.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Cliente  - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Predicados sobre Datas
+antesDe(D1/M1/A1,D2/M2/A2) :- A1 < A2.
+antesDe(D1/M1/A1,D2/M2/A1) :- M1 < M2.
+antesDe(D1/M1/A1,D2/M1/A1) :- D1 =< D2.
+
+depoisDe(D1/M1/A1,D2/M2/A2) :- A1 > A2.
+depoisDe(D1/M1/A1,D2/M2/A1) :- M1 > M2.
+depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
