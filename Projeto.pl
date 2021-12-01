@@ -189,14 +189,31 @@ satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(NomeCliente, ID, Cla
 % Apresenta o número total de entregas pelo diferentes meios de transporte num determinado intervalo de tempo
 % Extensão do predicado totalEntregasVeiculo: DataI, DataF, Bicicleta/Moto/Carro -> {V,F}
 
-totalEntregasVeiculo(D1,D2,B/M/C).
+totalEntregasVeiculo(D1,D2,B/M/C) :- totalEntregasIntervaloTempo(D1,D2,L),
+        totalEntregasBic(L,B),
+        totalEntregasMoto(L,M),
+        totalEntregasCarro(L,C).
 
-totalEntregasIntervaloTempo(D1,D2,L) :- listarEntregas( Entregas ), totalEntregasIntervaloTempoAux(D1,D2,Entregas,L).
+totalEntregasIntervaloTempo(D1,D2,L) :- listarEntregas( Entregas ),
+        totalEntregasIntervaloTempoAux(D1,D2,Entregas,L).
+        
 totalEntregasIntervaloTempoAux(_,_,[],[]).
 totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T1]) :- 
         antesDe(Data,D2),depoisDe(Data,D1),!,totalEntregasIntervaloTempoAux(D1,D2,T,T1).
 totalEntregasIntervaloTempoAux(D1,D2,[(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],T1) :-
         totalEntregasIntervaloTempoAux(D1,D2,T,T1).
+
+totalEntregasCarro([],0).
+totalEntregasCarro([(_,_,_,_,carro)|T],X) :- totalEntregasCarro(T,Y),!, X is Y+1.
+totalEntregasCarro([_|T],X) :- totalEntregasCarro(T,X).
+
+totalEntregasMoto([],0).
+totalEntregasMoto([(_,_,_,_,moto)|T],X) :- totalEntregasMoto(T,Y),!,X is Y+1.
+totalEntregasMoto([_|T],X) :- totalEntregasMoto(T,X).
+
+totalEntregasBic([],0).
+totalEntregasBic([(_,_,_,_,bicicleta)|T],X) :- totalEntregasBic(T,Y),!, X is Y+1.
+totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 8 - - - - - -  -  -  -  -   -
