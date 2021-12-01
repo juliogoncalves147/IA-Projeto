@@ -49,7 +49,8 @@ remocao( Termo ):-
 concluido(5, 4, date(2021,11,8)).
 concluido(7, 7, date(2021,6,9)).
 concluido(6, 5, date(2021,6,9)).
-%--------------------------------- - - - - - - - - - -  -  -s  -  -   -
+concluido(3, 6, date(2021,11,12)).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
@@ -280,6 +281,15 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 9 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+totalEntreguesENaoEntregues(D1,D2,Ent/NEnt) :- totalEntregasIntervaloTempo(D1,D2,L), totalEntreguesENaoEntreguesAux(D1,D2,L,Ent/NEnt).
+
+totalEntreguesENaoEntreguesAux(_,_,[],0/0).
+totalEntreguesENaoEntreguesAux(D1,D2,[(IdEntrega, _, _, _, _)|T],Ent/NEnt) :- 
+        \+concluido(IdEntrega,_,_),!, totalEntreguesENaoEntreguesAux(D1,D2,T,Ent/OldNEnt), NEnt is OldNEnt + 1.
+totalEntreguesENaoEntreguesAux(D1,D2,[(IdEntrega, _, _, _, _)|T],Ent/NEnt) :-
+        concluido(IdEntrega,_,D3), antesDe(D3,D2), depoisDe(D3,D1),!, totalEntreguesENaoEntreguesAux(D1,D2,T, OldEnt/NEnt), Ent is OldEnt + 1.
+totalEntreguesENaoEntreguesAux(D1,D2,[_|T],Ent/NEnt) :- totalEntreguesENaoEntreguesAux(D1,D2,T,Ent/OldNEnt), NEnt is OldNEnt + 1.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 10 - - - - - -  -  -  -  -  -
