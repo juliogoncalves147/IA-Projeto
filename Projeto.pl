@@ -46,28 +46,33 @@ remocao( Termo ):-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Concluido - Predicado para dar as encomendas que já foram entregues
 % Extensao do predicado concluido : IdEntrega, IdEncomenda, DataConcluida -> { V, F }
-concluido(5,4, date(2021,11,8)).
-
+concluido(5, 4, date(2021,11,8)).
+concluido(7, 7, date(2021,6,9)).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
-encomenda(1,prado,2,5,50,pendente).
-encomenda(2,maximinos,17,10,60,caminho).
-encomenda(3,prado,12,67,250,pendente).             
-encomenda(4,lamacaes,77,18,27,finalizada).
-encomenda(5,gualtar,2,2,1500,pendente).
-encomenda(6,lomar,1.5, 4, 30,caminho).
+encomenda(1, prado,     15,   5,  50,   pendente).
+encomenda(2, maximinos, 3,  10, 60,   caminho).
+encomenda(3, prado,     12,  67, 250,  pendente).             
+encomenda(4, lamacaes,  10,  18, 27,   finalizada).
+encomenda(5, gualtar,   2,   2,  1500, pendente).
+encomenda(6, lomar,     70, 4,  30,   caminho).
+encomenda(7, prado,     30,   4,  42,   finalizada).
+encomenda(8, merelim,   35,   3,  25,   caminho).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
 % Extensao do predicado entrega : IdEntrega, Data, IdEncomenda, Prazo, Transporte -> { V, F }
-entrega(4,date(2021,10,2),2,13,bicicleta).
-entrega(2,date(2021,10,3),3,1,moto).
-entrega(1,date(2021,11,4),1,2,moto).
-entrega(3,date(2021,11,7),6,3,carro). 
-entrega(5,date(2021,11,7),4,2,moto).
-entrega(6,date(2021,10,3),5,7,bicicleta).
+entrega( 4, date(2021,10,2), 2,13, bicicleta).
+entrega( 2, date(2021,10,3), 3, 1, moto).
+entrega( 1, date(2021,11,4), 1, 2, moto).
+entrega( 3, date(2021,11,7), 6, 3, carro). 
+entrega( 5, date(2021,11,7), 4, 2, moto).
+entrega( 6, date(2021,10,3), 5, 7, bicicleta).
+entrega( 7, date(2021,6 ,4), 7, 8, carro).
+entrega( 8, date(2021,9,10), 8, 5, carro).
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Estafeta
@@ -77,19 +82,28 @@ estafeta(luis,3).
 estafeta(andre,2).
 estafeta(maria,5).
 estafeta(andre,4).
+estafeta(maria,7).
+estafeta(andre,6).
+estafeta(luis,8).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Cliente
 % Extensao do predicado cliente : NomeCliente, IdEntrega, Classificacao -> { V, F }
-cliente(joao,1,3).
-cliente(joaquim,5,3).
-cliente(joao,2,2).
-cliente(martim,3,5).
-cliente(daniel,4,5).
+cliente(joao, 1,3).
+cliente(joaquim, 5,3).
+cliente(joao, 2,2).
+cliente(martim, 3,5).
+cliente(daniel, 4,5).
+cliente(ze, 8, 4).
+cliente(joao,6, 3.5).
+cliente(martim, 7, 2).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%-----------------------------	PREDICADOS	- - - - -  - - - - -  -  -  
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%-----------------------------	PREDICADOS  - - - - -  - - - - -  -  -  
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
 % Apresenta uma lista de todos os estafetas da empresa
 % Extensão do predicado listarEstafetas: Lista -> {V,F}
 listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, _), R), diferentes(R, L).
@@ -120,6 +134,7 @@ finalizaEncomenda(L) :- solucoes((L,Freguesia,Peso,Volume,Preco,_),
 
 % Faz a involução da encomenda
 finalizaEncomendaAuxI(L) :- involucao(encomenda(L,_,_,_,_,_)).
+
 % Faz a evolucao da encomenda com o estado atualizado
 finalizaEncomendaAuxE((L,Freguesia,Peso,Volume,Preco,_)) :- evolucao(encomenda(L, Freguesia, Peso, Volume, Preco, finalizado)).
 
@@ -373,6 +388,11 @@ devolveListaVeiculos([H|T], L) :- solucoes(Veiculo, entrega(H, _, _, _, Veiculo)
 valorEcologico(bicicleta, L):- L is 1.
 valorEcologico(moto, L):- L is 2.
 valorEcologico(carro, L):- L is 3.
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Devolve a velocidade media de cada veiculo.
+velocidade(bicicleta, L) :- L is 10.
+velocidade(moto, L) :- L is 35.
+velocidade(carro, L) :- L is 25.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Testa se um meio de transporte é válido.
@@ -390,6 +410,16 @@ currentDate(Today) :-
     get_time(Stamp),
     stamp_date_time(Stamp,DateTime,local),
     date_time_value(date,DateTime,Today).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Dado o id de uma encomenda devolve o Peso desta.
+getPeso(Id,L) :- solucoes(Peso, encomenda(Id,_,Peso,_,_,_),[R|T]), L is R.
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Dado um peso, vê se o meio de transporte é adequado
+testaPesoTransporte(L, carro) :- L =< 100 .
+testaPesoTransporte(L, moto) :- L =< 20 .
+testaPesoTransporte(L, bicicleta) :- L =< 5 .
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % testa se uma classificação é válida.
@@ -415,7 +445,7 @@ depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Invariante Estrutural -> não permite a inserção caso já exista uma encomenda com esse IdEncomenda
 +encomenda(IdEncomenda,_,_,_,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_,_)), R), 
-                                   comprimento(R, L), L == 1).
+                                      comprimento(R, L), L == 1).
 
 % Invariante Estrutural -> não permite a inserção caso seja dado um Peso negativo
 +encomenda(_,_,Peso,_,_,_) :: naoNegativo(Peso).
@@ -441,25 +471,28 @@ depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
 
 % Invariante Estrutural -> não permite a inserção caso já existe uma entrega associada a uma encomenda
 +entrega(_,_,IdEncomenda,_,_) :: (solucoes((IdEncomenda), (entrega(_,_,IdEncomenda,_,_)), S),
-                                 comprimento(S,L), L == 1).
+                                  comprimento(S,L), L == 1).
 
 % Invariante Estrutural -> não permite a inserção caso não exista uma encomenda associada a esse IdEncomenda
 +entrega(_,_,IdEncomenda,_,_) :: (solucoes((IdEncomenda), (encomenda(IdEncomenda,_,_,_,_,_)), S),
-                                 comprimento(S,L), L == 1).         
+                                  comprimento(S,L), L == 1).         
 
 % Invariante Estrutural -> não permite a inserção caso não seja inserido um meio de transporte válido
 +entrega(_,_,_,_,Transporte) :: testaTransporte(Transporte).    
+
+% Invariante Estrutural -> não permite a inserção caso o peso da encomenda associada seja superior ao do transporte
++entrega(_,_,IdEncomenda,_,Transporte) :: (getPeso(IdEncomenda,L), testaPesoTransporte(L, Transporte)). 
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Estafeta - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Invariante Estrutural -> não permite a inserção de um estafeta associado a uma entrega que não existe
 +estafeta(_, IdEntrega) :: (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), S),
-                                 comprimento(S,L), L == 1).
+                            comprimento(S,L), L == 1).
 
 % Invariante Estrutural -> não permite a inserção de um estafeta associado a uma entrega que já estava associada a outro estafeta
 +estafeta(_, IdEntrega) :: (solucoes((IdEntrega), (estafeta(_, IdEntrega)), S),
-                                 comprimento(S,L), L == 1).
+                            comprimento(S,L), L == 1).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- Cliente  - - - - - -  -  -  -  -  -
@@ -469,5 +502,5 @@ depoisDe(D1/M1/A1,D2/M1/A1) :- D1 >= D2.
 
 % Invariante Estrutural -> não permite a inserção caso não seja inserido um meio de transporte válido
 +cliente(_,IdEntrega,_) :- (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), S),
-                           comprimento(S,L), L == 1).
+                            comprimento(S,L), L == 1).
 
