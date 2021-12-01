@@ -109,16 +109,14 @@ listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
-estafetaEcologico(L) :- listarEstafetas(R), estafetaEcologicoAux(R,100,L).
+estafetaEcologico(FINAL) :- listarEstafetas(R), estafetaEcologicoAux(R,100,L,FINAL).
 
-estafetaEcologicoAux([], _, _).
-estafetaEcologicoAux([X],_,X).
-estafetaEcologicoAux([R|T],MIN,L) :- calcula(R, R1),
-				     (R1 < MIN) -> estafetaEcologicoAux(T, R1, R) ; estafetaEcologicoAux(T, MIN, L).
+estafetaEcologicoAux([],_,L,L).
+estafetaEcologicoAux([R|T],MIN,L,FINAL) :- calcula(R, R1),
+				     (R1 < MIN) -> estafetaEcologicoAux(T, R1, R,FINAL) ; estafetaEcologicoAux(T, MIN, L, FINAL).
 
 calcula(R, L) :- solucoes(Id, estafeta(R, Id), R1), devolveListaVeiculos(R1, R2), calculaValorEcologico(R2, L).
-
-%% Acabar isto não está a funcionar					 
+					 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 2 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
