@@ -173,7 +173,7 @@ count(_, [], 0).
 count(X, [X | T], N) :- !, count(X, T, N1), N is N1 + 1.
 count(X, [_ | T], N) :- count(X, T, N).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- QUERY 6 -0 - - - - -  -  -  -  -   -
+%--------------------------------- QUERY 6 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a classificacao media de satisfação de um estafeta
 % Extensão do predicado satisfacao: Nome Estafeta, Variável -> {V,F}
