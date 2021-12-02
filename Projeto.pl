@@ -110,55 +110,6 @@ cliente(ze, 9, 2).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
-% Apresenta uma lista de todos os estafetas da empresa
-% Extensão do predicado listarEstafetas: Lista -> {V,F}
-listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, _), R), diferentes(R, L).
-
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Apresenta uma lista de todos os clientes da empresa
-% Extensão do predicado listarCliente: Lista -> {V,F}
-listarCliente( L ) :- solucoes(Nome, cliente(Nome, _, _), R), 
-                      diferentes(R, L).
-
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Apresenta uma lista de todos as encomendas da empresa
-% Extensão do predicado listarEncomendas: Lista -> {V,F}
-listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda, Estado), 
-                         encomenda(IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda, Estado), R), 
-                         diferentes(R, L).
-
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Altera o estado de uma encomenda para finalizada e adiciona como concluida na base de conhecimento.
-finalizaEncomenda(L) :- solucoes((L,Freguesia,Peso,Volume,Preco,_), 
-                        encomenda(L,Freguesia,Peso,Volume,Preco,_), [R|T]), 
-                        finalizaEncomendaAuxI(L), 
-                        finalizaEncomendaAuxE(R),
-                        eConcluida(L).
-
-% Faz a involução da encomenda
-finalizaEncomendaAuxI(L) :- involucao(encomenda(L,_,_,_,_,_)).
-
-% Faz a evolucao da encomenda com o estado atualizado
-finalizaEncomendaAuxE((L,Freguesia,Peso,Volume,Preco,_)) :- evolucao(encomenda(L, Freguesia, Peso, Volume, Preco, finalizado)).
-
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Após uma encomenda ser dado como finalizada, aumenta a base do conhecimento com a conclusão de uma encomenda.
-eConcluida(L) :- solucoes(R,entrega(R,_,L,_,_), [F|T]),
-                 currentDate(D),
-                 evolucao(concluido(F,L,D)).
-
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Apresenta uma lista de todos as entregas da empresa
-% Extensão do predicado listarEntregas: Lista -> {V,F}
-listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte), 
-                       entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), R), 
-                       diferentes(R, L).
-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -281,6 +232,7 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 8 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
 totalEntregasEstafeta(D1,D2,Res) :- totalEntregasIntervaloTempo(D1,D2,L), %(Entregas)
 listarEstafetasId(E), %(Nome,Id)
 totalEntregasEstafetaAux(L,E,Res).
@@ -338,6 +290,51 @@ calculaPeso(_,0).
 %---------------------- Predicados Auxiliares  - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+% Apresenta uma lista de todos os estafetas da empresa
+% Extensão do predicado listarEstafetas: Lista -> {V,F}
+listarEstafetas( L ) :- solucoes(Nome, estafeta(Nome, _), R), diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos os clientes da empresa
+% Extensão do predicado listarCliente: Lista -> {V,F}
+listarCliente( L ) :- solucoes(Nome, cliente(Nome, _, _), R), 
+                      diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos as encomendas da empresa
+% Extensão do predicado listarEncomendas: Lista -> {V,F}
+listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda, Estado), 
+                         encomenda(IdEncomenda,Nome, Peso, Volume,  PrecoEncomenda, Estado), R), 
+                         diferentes(R, L).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Altera o estado de uma encomenda para finalizada e adiciona como concluida na base de conhecimento.
+finalizaEncomenda(L) :- solucoes((L,Freguesia,Peso,Volume,Preco,_), 
+                        encomenda(L,Freguesia,Peso,Volume,Preco,_), [R|T]), 
+                        finalizaEncomendaAuxI(L), 
+                        finalizaEncomendaAuxE(R),
+                        eConcluida(L).
+
+% Faz a involução da encomenda
+finalizaEncomendaAuxI(L) :- involucao(encomenda(L,_,_,_,_,_)).
+
+% Faz a evolucao da encomenda com o estado atualizado
+finalizaEncomendaAuxE((L,Freguesia,Peso,Volume,Preco,_)) :- evolucao(encomenda(L, Freguesia, Peso, Volume, Preco, finalizado)).
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Após uma encomenda ser dado como finalizada, aumenta a base do conhecimento com a conclusão de uma encomenda.
+eConcluida(L) :- solucoes(R,entrega(R,_,L,_,_), [F|T]),
+                 currentDate(D),
+                 evolucao(concluido(F,L,D)).
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Apresenta uma lista de todos as entregas da empresa
+% Extensão do predicado listarEntregas: Lista -> {V,F}
+listarEntregas( L ) :- solucoes((IdEntrega, Data, IdEncomenda, Prazo, Transporte), 
+                       entrega(IdEntrega, Data, IdEncomenda, Prazo, Transporte), R), 
+                       diferentes(R, L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % remove os elementos repetidos de uma lista
