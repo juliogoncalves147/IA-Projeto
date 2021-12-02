@@ -239,7 +239,7 @@ totalEntregasEstafeta(D1,D2,Res) :- totalEntregasIntervaloTempo(D1,D2,L), %(Entr
         agroup(NewL,Res).
 
 totalEntregasEstafetaAux([],[]).
-totalEntregasEstafetaAux([(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],[(Nome,1)|T1]) :- estafeta(Nome,IdEntrega),
+totalEntregasEstafetaAux([(IdEntrega, _, _, _, _)|T],[(Nome,1)|T1]) :- estafeta(Nome,IdEntrega),
         !,
         totalEntregasEstafetaAux(T,T1).
 
