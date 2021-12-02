@@ -165,7 +165,7 @@ fatura(Data, L) :- solucoes(IdEncomenda, entrega(_, Data, IdEncomenda,_, _), S),
 % Dados os Ids das encomentas de um determinado dia calcula a faturação
 faturaAux([],0).
 faturaAux([ID|T], L) :- encomenda(ID, _, _, _, Preco,_),
-        faturaAux(T,OldL),L is Preco + OldL.
+                        faturaAux(T,OldL),L is Preco + OldL.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
@@ -190,9 +190,8 @@ satisfacao(Nome, L) :-  solucoes(ID, estafeta(Nome, ID), S),
 
 % Dado uma lista de Ids de encomendas calcula as classificações dadas pelos clientes.
 satisfacaoAux([],0).
-satisfacaoAux([ID|T], Res) :- 
-                cliente(_, ID, Classificacao),!, 
-                satisfacaoAux(T, Y) , Res is Classificacao+Y.
+satisfacaoAux([ID|T], Res) :- cliente(_, ID, Classificacao),!, 
+                              satisfacaoAux(T, Y) , Res is Classificacao+Y.
                         
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
