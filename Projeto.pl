@@ -75,8 +75,8 @@ entrega( 3, date(2021,11,7), 6, 3, carro).
 entrega( 5, date(2021,11,7), 4, 2, moto).
 entrega( 6, date(2021, 6,6), 5, 7, bicicleta).
 entrega( 7, date(2021, 6,4), 7, 8, carro).
-entrega( 8, date(2021 9,10), 8, 5, carro).
-entrega( 9, date(2021, 6,1), 9, 20, carro)
+entrega( 8, date(2021, 9,10), 8, 5, carro).
+entrega( 9, date(2021, 6,1), 9, 20, carro).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Estafeta
@@ -235,20 +235,37 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 
 totalEntregasEstafeta(D1,D2,Res) :- totalEntregasIntervaloTempo(D1,D2,L), %(Entregas)
 listarEstafetasId(E), %(Nome,Id)
-totalEntregasEstafetaAux(L,E,Res).
+totalEntregasEstafetaAux(L,E,Tmp), %Lista com pares (estafeta,1) caso tenham feito entregas 
+agroup(Tmp,Res).%agrupa quem fez mais que uma entrega (andre,1),(andre,1)->(andre,2)
 
 totalEntregasEstafetaAux(_,[],[]).
 totalEntregasEstafetaAux(Entregas, [(Nome,Id)|Cs], [(Nome,Nr)|Resto]):-calculaNrEntregas((Nome,Id),Entregas,0,Nr),
          totalEntregasEstafetaAux(Entregas,Cs,Resto).
 
 
-listarEstafetasId( L ) :- solucoes((Nome,Id), estafeta(Nome, Id), R), diferentes(R, L).
-
 calculaNrEntregas(_,[],X,X).
 calculaNrEntregas((Nome,Id),[(Id,_,_,_,_)|Es],X,Y):- 
                 calculaNrEntregas((Nome,Id),Es,X2,Y), X2 is X+1.
 calculaNrEntregas(Estafeta,[_|Es],X,Y):- 
 calculaNrEntregas(Estafeta,Es,X,Y).
+
+
+listarEstafetasId(L) :- solucoes((Nome,Id), estafeta(Nome, Id), R), diferentes(R, L). %lista os estafetas e as ids das entregas 
+
+agroup([],[]).
+agroup([(A,X)|Tail],[(A,Z)|Res]):-member((A,_),Tail), 
+                conta(A,Tail,Y), 
+                removeParesFirst(A,Tail,Tmp),
+                agroup(Tmp,Res), Z is Y+X.
+agroup([(A,X)|Tail],[(A,X)|Res]):-not(member((A,_),Tail)),agroup(Tail,Res).
+
+removeParesFirst(_,[],[]).
+removeParesFirst(A,[(A,_)|Tail], Res):-removeParesFirst(A,Tail,Res).
+removeParesFirst(A,[(B,K)|Tail], [(B,K)|Res]):- B\=A, removeParesFirst(A,Tail,Res).
+
+conta(_,[],0).
+conta(A,[(B,_)|Tail],Y):- B\=A, conta(A,Tail,Y).
+conta(A,[(A,X)|Tail],Y):-conta(A,Tail,X2), Y is X2+X.
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 9 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -278,7 +295,7 @@ calculaIdsEntrega(R, X, L) :- solucoes(IdEntrega, estafeta(R,IdEntrega), T), cal
 
 % Dado uma lista de IdsEntrega, verifica a data -> devolve o peso, faz a recursiva
 calculaIdsEncomenda([], _, 0).
-calculaIdsEncomenda([R|T], X, L) :-  \+ (concluido(R, IdEncomenda, X)) , calculaIdsEncomenda(T, X, L).
+calculaIdsEncomenda([R|T], X, L) :-  \+ (concluido(R, _, X)) , calculaIdsEncomenda(T, X, L).
 calculaIdsEncomenda([R|T], X, L) :- concluido(R, IdEncomenda, X), calculaPeso(IdEncomenda,F), 
                                     calculaIdsEncomenda(T, X, R1), L is R1 + F.
 
@@ -311,7 +328,7 @@ listarEncomendas( L ) :- solucoes((IdEncomenda,Nome, Peso, Volume,  PrecoEncomen
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Altera o estado de uma encomenda para finalizada e adiciona como concluida na base de conhecimento.
 finalizaEncomenda(L) :- solucoes((L,Freguesia,Peso,Volume,Preco,_), 
-                        encomenda(L,Freguesia,Peso,Volume,Preco,_), [R|T]), 
+                        encomenda(L,Freguesia,Peso,Volume,Preco,_), [R|_]), 
                         finalizaEncomendaAuxI(L), 
                         finalizaEncomendaAuxE(R),
                         eConcluida(L).
@@ -325,7 +342,7 @@ finalizaEncomendaAuxE((L,Freguesia,Peso,Volume,Preco,_)) :- evolucao(encomenda(L
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Após uma encomenda ser dado como finalizada, aumenta a base do conhecimento com a conclusão de uma encomenda.
-eConcluida(L) :- solucoes(R,entrega(R,_,L,_,_), [F|T]),
+eConcluida(L) :- solucoes(R,entrega(R,_,L,_,_), [F|_]),
                  currentDate(D),
                  evolucao(concluido(F,L,D)).
 
@@ -463,7 +480,7 @@ currentDate(Today) :-
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Dado o id de uma encomenda devolve o Peso desta.
-getPeso(Id,L) :- solucoes(Peso, encomenda(Id,_,Peso,_,_,_),[R|T]), L is R.
+getPeso(Id,Peso) :- encomenda(Id,_,Peso,_,_,_).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Dado um peso, vê se o meio de transporte é adequado
