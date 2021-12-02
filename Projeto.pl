@@ -233,23 +233,13 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
 totalEntregasEstafeta(D1,D2,Res) :- totalEntregasIntervaloTempo(D1,D2,L), %(Entregas)
-listarEstafetasId(E), %(Nome,IdEntrega)
-totalEntregasEstafetaAux(L,E,Tmp), %Lista com pares (estafeta,1) caso tenham feito entregas 
-agroup(Tmp,Res).%agrupa quem fez mais que uma entrega (andre,1),(andre,1)->(andre,2)
+        totalEntregasEstafetaAux(L,NewL),
+        agroup(NewL,Res).
 
-totalEntregasEstafetaAux(_,[],[]).
-totalEntregasEstafetaAux(Entregas, [(Nome,Id)|Cs], [(Nome,Nr)|Resto]):-calculaNrEntregas((Nome,Id),Entregas,0,Nr),
-         totalEntregasEstafetaAux(Entregas,Cs,Resto).
-
-
-calculaNrEntregas(_,[],X,X).
-calculaNrEntregas((Nome,Id),[(Id,_,_,_,_)|Es],X,Y):- 
-                calculaNrEntregas((Nome,Id),Es,X2,Y), X2 is X+1.
-calculaNrEntregas(Estafeta,[_|Es],X,Y):- 
-                calculaNrEntregas(Estafeta,Es,X,Y).
-
-
-listarEstafetasId(L) :- solucoes((Nome,Id), estafeta(Nome, Id), R), diferentes(R, L). %lista os estafetas e as ids das entregas 
+totalEntregasEstafetaAux([],[]).
+totalEntregasEstafetaAux([(IdEntrega, Data, IdEncomenda, Prazo, Transporte)|T],[(Nome,1)|T1]) :- estafeta(Nome,IdEntrega),
+        !,
+        totalEntregasEstafetaAux(T,T1).
 
 agroup([],[]).
 agroup([(A,X)|Tail],[(A,Z)|Res]):-member((A,_),Tail), 
