@@ -158,14 +158,12 @@ clienteEstafetaAux([ID|T], L) :- solucoes(Nome, cliente(Nome,ID, _), R1),
 % Apresenta a faturação da empresa num determinado dia
 % Extensão do predicado estafetaCliente: Data, Variável -> {V,F}
 fatura(Data, L) :- solucoes(IdEncomenda, entrega(_, Data, IdEncomenda,_, _), S),
-                   diferentes(S, S1),
-		   faturaAux(S1, S2), somaC(S2,L).
+		   faturaAux(S,L).
 
 % Dados os Ids das encomentas de um determinado dia calcula a faturação
-faturaAux([],[]).
-faturaAux([ID|T], L) :- solucoes(Preco, encomenda(ID, _, _, _, Preco,_), R1),
-                        faturaAux(T,R2), 
-                        concatenar(R1,R2, L).
+faturaAux([],0).
+faturaAux([ID|T], L) :- encomenda(ID, _, _, _, Preco,_),
+        faturaAux(T,OldL),L is Preco + OldL.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 5 - - - - - -  -  -  -  -   -
@@ -184,15 +182,16 @@ freguesiaPlusAux([R|T],N, L, Final) :-  count(R, [R|T], N1),
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a classificacao media de satisfação de um estafeta
 % Extensão do predicado satisfacao: Nome Estafeta, Variável -> {V,F}
-satisfacao(Nome, L) :- solucoes(ID, estafeta(Nome, ID), S), 
-                       diferentes(S, S1),
-		       satisfacaoAux(S1, L1), media(L1, L).
+satisfacao(Nome, L) :-  solucoes(ID, estafeta(Nome, ID), S), 
+		        satisfacaoAux(S, L1),length(S, X),
+                        L is L1/X.
 
 % Dado uma lista de Ids de encomendas calcula as classificações dadas pelos clientes.
-satisfacaoAux([],[]).
-satisfacaoAux([ID|T], L) :- solucoes(Classificacao, cliente(_, ID, Classificacao), S), 
-                            satisfacaoAux(T, S1), 
-                            concatenar(S,S1, L).
+satisfacaoAux([],0).
+satisfacaoAux([ID|T], Res) :- 
+                cliente(_, ID, Classificacao),!, 
+                satisfacaoAux(T, Y) , Res is Classificacao+Y.
+                        
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 7 - - - - - -  -  -  -  -   -
@@ -234,7 +233,7 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
 totalEntregasEstafeta(D1,D2,Res) :- totalEntregasIntervaloTempo(D1,D2,L), %(Entregas)
-listarEstafetasId(E), %(Nome,Id)
+listarEstafetasId(E), %(Nome,IdEntrega)
 totalEntregasEstafetaAux(L,E,Tmp), %Lista com pares (estafeta,1) caso tenham feito entregas 
 agroup(Tmp,Res).%agrupa quem fez mais que uma entrega (andre,1),(andre,1)->(andre,2)
 
@@ -247,7 +246,7 @@ calculaNrEntregas(_,[],X,X).
 calculaNrEntregas((Nome,Id),[(Id,_,_,_,_)|Es],X,Y):- 
                 calculaNrEntregas((Nome,Id),Es,X2,Y), X2 is X+1.
 calculaNrEntregas(Estafeta,[_|Es],X,Y):- 
-calculaNrEntregas(Estafeta,Es,X,Y).
+                calculaNrEntregas(Estafeta,Es,X,Y).
 
 
 listarEstafetasId(L) :- solucoes((Nome,Id), estafeta(Nome, Id), R), diferentes(R, L). %lista os estafetas e as ids das entregas 
@@ -288,7 +287,7 @@ pesoTransportado(X, L) :- listarEstafetas(T), procura(T, X, L).
 
 % Dada uma lista de estafetas, calcula o peso que cada um carregava recursivamente
 procura([],_,[]).
-procura([R|T], X, [R/F|L]) :-  calculaIdsEntrega(R, X, F), procura(T, X, L).
+procura([R|T], X, [R/F|L]) :-  calculaIdsEntrega(R, X, F),!, procura(T, X, L).
 
 % Dado o nome de um estafeta, calcula todos os IdEntrega associados a ele
 calculaIdsEntrega(R, X, L) :- solucoes(IdEntrega, estafeta(R,IdEntrega), T), calculaIdsEncomenda(T, X, L).
@@ -422,8 +421,8 @@ contem(X, [_|T]) :- contem(X, T).
 % Faz a media de uma lista
 % Extensao do predicado media: L,R -> {V,F}
 
-media([H|T],S) :- somaC([H|T],S1), 
-                  comprimento([H|T],S2), S is S1/S2.
+media(L,S) :- somaC(L,S1), 
+                  comprimento(L,S2), S is S1/S2.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Remove os elementos repetidos de uma lista
