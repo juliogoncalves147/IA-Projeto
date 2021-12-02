@@ -113,7 +113,8 @@ cliente(ze, 9, 2).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-
+% Apresenta o estafeta que utilizou mais vezes um meio de transporte ecológico.
+% Extensão do predicado estafetaEcologico: Nome cliente, Lista -> {V,F}
 estafetaEcologico(FINAL) :- listarEstafetas(R), estafetaEcologicoAux(R,100,_,FINAL).
 
 estafetaEcologicoAux([],_,L,L).
@@ -135,7 +136,8 @@ estafetaCliente(NomeCliente, L) :- solucoes(ID, cliente(NomeCliente, ID, _), S),
 estafetaClienteAux([], []).							
 estafetaClienteAux([ID|T] , L) :- solucoes(Nome, estafeta(Nome, ID), R1), 
                                   estafetaClienteAux(T, R2), 
-                                  concatenar(R1, R2, L).
+                                  concatenar(R1, R2, R3),
+                                  diferentes(R3,L).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 3 - - - - - -  -  -  -  -   -
@@ -170,7 +172,7 @@ faturaAux([ID|T], L) :- encomenda(ID, _, _, _, Preco,_),
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Apresenta a freguesia com maior volume de encomendas
 % Extensão do predicado freguesiaPlus: Variavel -> {V,F}
-freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(_,Freguesia,_,_,_,_), R), freguesiaPlusAux(R,0,_, Final).
+freguesiaPlus(Final) :- solucoes(Freguesia, encomenda(_,Freguesia,_,_,_,_), R),diferentes(R,R1), freguesiaPlusAux(R1,0,_, Final).
 
 
 freguesiaPlusAux([], _, L, L).     
@@ -554,9 +556,22 @@ depoisDe(date(A1,M1,D1),date(A1,M1,D2)) :- D1 >= D2.
 %--------------------------------- Cliente  - - - - - -  -  -  -  -  -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Invariante Estrutural -> não permite a inserção caso o cliente dê uma classificação não elegivel
-+cliente(_,_,L) :- testaClassificacao(L).
++cliente(_,_,L) :: testaClassificacao(L).
 
 % Invariante Estrutural -> não permite a inserção caso não seja inserido um meio de transporte válido
-+cliente(_,IdEntrega,_) :- (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), S),
++cliente(_,IdEntrega,_) :: (solucoes((IdEntrega), (entrega(IdEntrega,_,_,_,_)), S),
                             comprimento(S,L), L == 1).
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- Concluida  - - - - - -  -  -  -  -  -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% Invariante Estrutural -> não permite a inserção caso a data de finalização não seja válida
++concluido(_,_,L) :: testaData(L).
+% Invariante Estrutural -> não permite a inserção caso a encomenda já não esteja inserida na base
+% de conhecimento como finalizada
++concluido(_,L,_) :: (solucoes((L), (encomenda(L,_,_,_,_,finalizada)), S),
+                     comprimento(S,N), N == 1).
+% Invariante Estrutural -> não permite a inserção caso a entrega associada não esteja inserida na
+% base de conhecimento
++concluido(L,_,_) :: (solucoes((L), (entrega(L,_,_,_,_)), S),
+                     comprimento(S,N), N == 1).
