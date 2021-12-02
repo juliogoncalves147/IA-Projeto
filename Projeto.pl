@@ -281,7 +281,22 @@ totalEntregasBic([_|T],X) :- totalEntregasBic(T,X).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 8 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+totalEntregasEstafeta(D1,D2,Res) :- totalEntregasIntervaloTempo(D1,D2,L), %(Entregas)
+listarEstafetasId(E), %(Nome,Id)
+totalEntregasEstafetaAux(L,E,Res).
 
+totalEntregasEstafetaAux(_,[],[]).
+totalEntregasEstafetaAux(Entregas, [(Nome,Id)|Cs], [(Nome,Nr)|Resto]):-calculaNrEntregas((Nome,Id),Entregas,0,Nr),
+         totalEntregasEstafetaAux(Entregas,Cs,Resto).
+
+
+listarEstafetasId( L ) :- solucoes((Nome,Id), estafeta(Nome, Id), R), diferentes(R, L).
+
+calculaNrEntregas(_,[],X,X).
+calculaNrEntregas((Nome,Id),[(Id,_,_,_,_)|Es],X,Y):- 
+                calculaNrEntregas((Nome,Id),Es,X2,Y), X2 is X+1.
+calculaNrEntregas(Estafeta,[_|Es],X,Y):- 
+calculaNrEntregas(Estafeta,Es,X,Y).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 9 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
