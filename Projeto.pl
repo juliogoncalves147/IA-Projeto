@@ -56,20 +56,20 @@ concluido(9, 9, date(2021,6,9)).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
-encomenda(1, prado,     15,   5,  50,   pendente).
+encomenda(1, sameiro,     15,   5,  50,   pendente).
 encomenda(2, maximinos, 3,  10, 60,   caminho).
-encomenda(3, prado,     12,  67, 250,  pendente).             
+encomenda(3, sameiro,     12,  67, 250,  pendente).             
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
 encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
-encomenda(7, prado,     30,   4,  42,   finalizada).
+encomenda(7, bom jesus,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
-encomenda(9, braga, 20, 2, 21, finalizada).
+encomenda(9, saoVitor, 20, 2, 21, finalizada).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
 % Extensao do predicado entrega : IdEntrega, Data, IdEncomenda, Prazo, Transporte -> { V, F }
-entrega( 4, date(2021,10,2), 2,13, bicicleta).
+entrega( 4, date(2021,10,2), 2, 13, bicicleta).
 entrega( 2, date(2021,10,3), 3, 1, moto).
 entrega( 1, date(2021,11,4), 1, 2, moto).
 entrega( 3, date(2021,11,7), 6, 3, carro). 
@@ -106,6 +106,9 @@ cliente(martim, 7, 2).
 cliente(ze, 9, 2).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+inicial(centroDeRecolha).
+final(centroDeRecolha).
+
 aresta(sameiro, lamacaes, 0.7).
 aresta(sameiro, bomJesus, 1.3).
 aresta(bomJesus, lamacaes, 2).
@@ -124,6 +127,7 @@ aresta(saoVicente, merelim, 4.7).
 aresta(saoVicente, amares, 11.8).
 aresta(saoVicente, vilaVerde, 12.6).
 
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %-----------------------------	PREDICADOS  - - - - -  - - - - -  -  -  
@@ -133,12 +137,15 @@ aresta(X,Y,_) :- aresta(Y,X,_).
 
 connected(X,Y) :- aresta(X,Y,_).
 
- 
-
-
 membro(X, [X|_]).
 membro(X, [_|Xs]):-
 	membro(X, Xs).
+
+
+
+
+
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
