@@ -136,8 +136,9 @@ estimaC(saoVitor,3.8,5).
 estimaC(maximinos,6.9,9).
 estimaC(saoVicente,6.4,9).
 estimaC(merelim,10.9,14).
-estinaC(amares,11,14).
+estimaC(amares,11,14).
 estimaC(vilaVerde,17.1,20).
+estimaC(centroDeRecolha,0,0).
 
 estimaM(Local,Km,NewTmp) :-
         estimaC(Local,Km,Tmp),
@@ -152,16 +153,15 @@ estimaB(saoVitor,3.4,9).
 estimaB(maximinos,7.6,24).
 estimaB(saoVicente,5.9,18).
 estimaB(merelim,10.7,31).
-estinaB(amares,10.5,39).
+estimaB(amares,10.5,39).
 estimaB(vilaVerde,11.8,43).
+estimaB(centroDeRecolha,0,0).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %-----------------------------	PREDICADOS  - - - - -  - - - - -  -  -  
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-aresta(X,Y,_) :- aresta(Y,X,_).
-
 connected(X,Y) :- aresta(X,Y,_).
 
 membro(X, [X|_]).
