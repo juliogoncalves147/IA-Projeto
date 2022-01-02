@@ -7,6 +7,9 @@
 :- dynamic cliente/3.
 :- dynamic concluido/3.
 
+:- discontiguous estimaB/3.
+:- discontiguous estima/3.
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: definicoes iniciais
@@ -212,6 +215,8 @@ limitadaAux(Destino,Caminho,Iter,Custo):-write(Iter), limite(Y), Iter<Y ,X is It
 
 limitadaProfundidade(Destino,Caminho,Limite,Custo):-
         procuraProfundidade(Destino,Caminho,Custo), Custo > 0 , Custo=<Limite.
+
+
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
