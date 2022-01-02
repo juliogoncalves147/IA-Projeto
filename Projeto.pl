@@ -111,14 +111,14 @@ final(centroDeRecolha).
 aresta(sameiro, lamacaes, 0.7).
 aresta(sameiro, bomJesus, 1.3).
 aresta(bomJesus, lamacaes, 2).
-aresta(bomJesus, centroDeRecolha, 5.4).
+aresta(bomJesus, centroDeRecolha, 5.6).
 aresta(lamacaes, lomar, 5.4).
 aresta(lamacaes, universidade, 3.1).
 aresta(lomar, saoVitor, 7.3).
 aresta(lomar, maximinos, 3.1).
 aresta(centroDeRecolha, maximinos, 6.9).
 aresta(saoVitor, maximinos, 3.6).
-aresta(centroDeRecolha, universidade, 2.2).
+aresta(centroDeRecolha, universidade, 6.1).
 aresta(centroDeRecolha, lamacaes, 5.1).
 aresta(universidade, saoVicente, 4.3).
 aresta(maximinos, saoVicente, 8).
@@ -126,6 +126,18 @@ aresta(saoVicente, merelim, 4.7).
 aresta(saoVicente, amares, 11.8).
 aresta(saoVicente, vilaVerde, 12.6).
 
+%estima(Destino,Km,Minutos)
+estima(sameiro,8.6,12).
+estima(bomJesus,5.6,8).
+estima(lamacaes,5.1,8).
+estima(lomar,8.3,12).
+estima(universidade,6.1,10).
+estima(saoVitor,3.8,5).
+estima(maximinos,6.9,9).
+estima(saoVicente,6.4,9).
+estima(merelim,10.9,14).
+estina(amares,11,14).
+estima(vilaVerde,17.1,20).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -

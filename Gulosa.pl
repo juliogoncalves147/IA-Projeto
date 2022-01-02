@@ -1,4 +1,4 @@
-resolve_gulosa(Nodo,Veiculo, CaminhoD/CustoD, CaminhoT/CustoT ) :-
+resolve_gulosa(Destino,Veiculo,Peso, CaminhoD/CustoD, CaminhoT/CustoT ) :-
     estima(Nodo,EstimaKm,EstimaTmp),
     agulosaD([[Nodo]/0/EstimaKm],InvCaminhoD/CustoD/_),
     agulosaT([[Nodo]/0/EstimaTmp],InvCaminhoT/CustoT/_),
@@ -54,3 +54,13 @@ adjacente2T([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstTmp) :-
     \+member(ProxNodo,Caminho),
     NovoCusto is Custo + PassoCustoTmp,
     estima(ProxNodo,_,EstTmp).
+
+calculaTempo(carro,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (25 - (0.1 * Peso)),
+    Tempo is VelocidadeMedia / Distancia.
+calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (10 - (0.7 * Peso)),
+    Tempo is VelocidadeMedia / Distancia.
+calculaTempo(moto,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (35 - (0.5 * Peso)),
+    Tempo is VelocidadeMedia / Distancia.
