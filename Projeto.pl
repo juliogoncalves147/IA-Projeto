@@ -6,7 +6,6 @@
 :- dynamic estafeta/2.
 :- dynamic cliente/3.
 :- dynamic concluido/3.
-:- dynamic aresta/3.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -52,7 +51,7 @@ concluido(7, 7, date(2021,6,9)).
 concluido(6, 5, date(2021,6,9)).
 concluido(3, 6, date(2021,11,12)).
 concluido(9, 9, date(2021,6,9)).
-%--------------------------------- - - - - - - - - - -  -  -s  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
@@ -112,20 +111,49 @@ final(centroDeRecolha).
 aresta(sameiro, lamacaes, 0.7).
 aresta(sameiro, bomJesus, 1.3).
 aresta(bomJesus, lamacaes, 2).
-aresta(bomJesus, centroDeRecolha, 5.4).
+aresta(bomJesus, centroDeRecolha, 5.6).
 aresta(lamacaes, lomar, 5.4).
 aresta(lamacaes, universidade, 3.1).
 aresta(lomar, saoVitor, 7.3).
 aresta(lomar, maximinos, 3.1).
 aresta(centroDeRecolha, maximinos, 6.9).
 aresta(saoVitor, maximinos, 3.6).
-aresta(centroDeRecolha, universidade, 2.2).
+aresta(centroDeRecolha, universidade, 6.1).
 aresta(centroDeRecolha, lamacaes, 5.1).
 aresta(universidade, saoVicente, 4.3).
 aresta(maximinos, saoVicente, 8).
 aresta(saoVicente, merelim, 4.7).
 aresta(saoVicente, amares, 11.8).
 aresta(saoVicente, vilaVerde, 12.6).
+
+%estima(Destino,Km,Minutos)
+estimaC(sameiro,8.6,12).
+estimaC(bomJesus,5.6,8).
+estimaC(lamacaes,5.1,8).
+estimaC(lomar,8.3,12).
+estimaC(universidade,6.1,10).
+estimaC(saoVitor,3.8,5).
+estimaC(maximinos,6.9,9).
+estimaC(saoVicente,6.4,9).
+estimaC(merelim,10.9,14).
+estinaC(amares,11,14).
+estimaC(vilaVerde,17.1,20).
+
+estimaM(Local,Km,NewTmp) :-
+        estimaC(Local,Km,Tmp),
+        NewTmp is (0.9 * Tmp). 
+
+estimaB(sameiro,6.4,49).
+estimaB(bomJesus,3.9,28).
+estimaB(lamacaes,4.7,16).
+estimaB(lomar,7.9,24).
+estimaB(universidade,2.3,7).
+estimaB(saoVitor,3.4,9).
+estimaB(maximinos,7.6,24).
+estimaB(saoVicente,5.9,18).
+estimaB(merelim,10.7,31).
+estinaB(amares,10.5,39).
+estimaB(vilaVerde,11.8,43).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
