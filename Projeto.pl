@@ -6,6 +6,7 @@
 :- dynamic estafeta/2.
 :- dynamic cliente/3.
 :- dynamic concluido/3.
+:- dynamic aresta/3.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -103,13 +104,41 @@ cliente(ze, 8, 4).
 cliente(joao,6, 3.5).
 cliente(martim, 7, 2).
 cliente(ze, 9, 2).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+aresta(sameiro, lamacaes, 0.7).
+aresta(sameiro, bomJesus, 1.3).
+aresta(bomJesus, lamacaes, 2).
+aresta(bomJesus, centroDeRecolha, 5.4).
+aresta(lamacaes, lomar, 5.4).
+aresta(lamacaes, universidade, 3.1).
+aresta(lomar, saoVitor, 7.3).
+aresta(lomar, maximinos, 3.1).
+aresta(centroDeRecolha, maximinos, 6.9).
+aresta(saoVitor, maximinos, 3.6).
+aresta(centroDeRecolha, universidade, 2.2).
+aresta(centroDeRecolha, lamacaes, 5.1).
+aresta(universidade, saoVicente, 4.3).
+aresta(maximinos, saoVicente, 8).
+aresta(saoVicente, merelim, 4.7).
+aresta(saoVicente, amares, 11.8).
+aresta(saoVicente, vilaVerde, 12.6).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %-----------------------------	PREDICADOS  - - - - -  - - - - -  -  -  
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
+aresta(X,Y,_) :- aresta(Y,X,_).
 
+connected(X,Y) :- aresta(X,Y,_).
+
+ 
+
+
+membro(X, [X|_]).
+membro(X, [_|Xs]):-
+	membro(X, Xs).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
