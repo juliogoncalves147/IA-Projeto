@@ -183,6 +183,19 @@ profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
     not(member(ProxNodo,Historico)),
     profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
 
+%------------Largura BFS-----------------------------
+
+%Largura (BFS - Breadth-First Search)
+larguraprimeiroBF(Orig, Dest, Cam):- larguraprimeiro(Dest,[[Orig]],Cam).
+
+larguraprimeiro(Dest, [[Dest|Tail]|_],Caminho) :- reverse([Dest|Tail],Caminho).
+larguraprimeiro(Dest, [Largura|Outros], Caminho) :- 
+        Largura=[NodoAtual|_],
+        findall([X|Largura],
+        (Dest==NodoAtual, aresta(NodoAtual,X,Custo), not(member(X,Largura))), Novos),
+        append(Outros, Novos, Todos),
+        larguraprimeiro(Dest, Todos, Caminho).
+
 
 %------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
 limite(50). %custo máximo do caminho em profundidade 
