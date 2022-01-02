@@ -183,6 +183,19 @@ profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
     not(member(ProxNodo,Historico)),
     profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
 
+
+%------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
+limite(50). %custo máximo do caminho em profundidade 
+
+aprofundamentoProgress(Destino,Caminho,Custo):- limitadaAux(Destino,Caminho,0,Custo). 
+
+limitadaAux(_,_,Y,_):-limite(K), K=<Y, fail.
+limitadaAux(Destino,Caminho,Iter,Custo):-limitadaProfundidade(Destino,Caminho,Iter,Custo),!.
+limitadaAux(Destino,Caminho,Iter,Custo):-write(Iter), limite(Y), Iter<Y ,X is Iter+1 ,limitadaAux(Destino,Caminho,X,Custo).
+
+limitadaProfundidade(Destino,Caminho,Limite,Custo):-
+        procuraProfundidade(Destino,Caminho,Custo), Custo > 0 , Custo=<Limite.
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
