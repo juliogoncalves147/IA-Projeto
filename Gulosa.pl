@@ -1,4 +1,6 @@
-resolve_gulosa(Destino,Veiculo,Peso, CaminhoD/CustoD, CaminhoT/CustoT ) :-
+:- include('Projeto.pl').
+
+resolve_gulosa(Nodo, Veiculo, Peso, CaminhoD/CustoD, CaminhoT/CustoT ) :-
     estima(Nodo,EstimaKm,EstimaTmp),
     agulosaD([[Nodo]/0/EstimaKm],InvCaminhoD/CustoD/_),
     agulosaT([[Nodo]/0/EstimaTmp],InvCaminhoT/CustoT/_),

@@ -127,17 +127,33 @@ aresta(saoVicente, amares, 11.8).
 aresta(saoVicente, vilaVerde, 12.6).
 
 %estima(Destino,Km,Minutos)
-estima(sameiro,8.6,12).
-estima(bomJesus,5.6,8).
-estima(lamacaes,5.1,8).
-estima(lomar,8.3,12).
-estima(universidade,6.1,10).
-estima(saoVitor,3.8,5).
-estima(maximinos,6.9,9).
-estima(saoVicente,6.4,9).
-estima(merelim,10.9,14).
-estina(amares,11,14).
-estima(vilaVerde,17.1,20).
+estimaC(sameiro,8.6,12).
+estimaC(bomJesus,5.6,8).
+estimaC(lamacaes,5.1,8).
+estimaC(lomar,8.3,12).
+estimaC(universidade,6.1,10).
+estimaC(saoVitor,3.8,5).
+estimaC(maximinos,6.9,9).
+estimaC(saoVicente,6.4,9).
+estimaC(merelim,10.9,14).
+estinaC(amares,11,14).
+estimaC(vilaVerde,17.1,20).
+
+estimaM(Local,Km,NewTmp) :-
+        estimaC(Local,Km,Tmp),
+        NewTmp is (0.9 * Tmp). 
+
+estimaB(sameiro,6.4,49).
+estimaB(bomJesus,3.9,28).
+estimaB(lamacaes,4.7,16).
+estimaB(lomar,7.9,24).
+estimaB(universidade,2.3,7).
+estimaB(saoVitor,3.4,9).
+estimaB(maximinos,7.6,24).
+estimaB(saoVicente,5.9,18).
+estimaB(merelim,10.7,31).
+estinaB(amares,10.5,39).
+estimaB(vilaVerde,11.8,43).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
