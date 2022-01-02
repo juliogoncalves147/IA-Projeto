@@ -61,7 +61,7 @@ encomenda(3, sameiro,     12,  67, 250,  pendente).
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
 encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
-encomenda(7, bom jesus,     30,   4,  42,   finalizada).
+encomenda(7, bomJesus,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
 encomenda(9, saoVitor, 20, 2, 21, finalizada).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -

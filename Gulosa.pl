@@ -1,4 +1,4 @@
-resolve_gulosa(Nodo, CaminhoD/CustoD, CaminhoT/CustoT ) :-
+resolve_gulosa(Nodo,Veiculo, CaminhoD/CustoD, CaminhoT/CustoT ) :-
     estima(Nodo,EstimaKm,EstimaTmp),
     agulosaD([[Nodo]/0/EstimaKm],InvCaminhoD/CustoD/_),
     agulosaT([[Nodo]/0/EstimaTmp],InvCaminhoT/CustoT/_),
