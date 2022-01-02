@@ -62,7 +62,7 @@ encomenda(3, sameiro,     12,  67, 250,  pendente).
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
 encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
-encomenda(7, bom jesus,     30,   4,  42,   finalizada).
+encomenda(7, bomJesus,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
 encomenda(9, saoVitor, 20, 2, 21, finalizada).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -127,24 +127,33 @@ aresta(saoVicente, merelim, 4.7).
 aresta(saoVicente, amares, 11.8).
 aresta(saoVicente, vilaVerde, 12.6).
 
-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %-----------------------------	PREDICADOS  - - - - -  - - - - -  -  -  
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-aresta(X,Y,_) :- aresta(Y,X,_).
-
-connected(X,Y) :- aresta(X,Y,_).
-
 membro(X, [X|_]).
 membro(X, [_|Xs]):-
 	membro(X, Xs).
 
+adjacente(Nodo, ProxNodo, C) :- aresta(Nodo, ProxNodo, C).
+adjacente(Nodo, ProxNodo, C) :- aresta(ProxNodo, Nodo, C).
 
 
+connected(X,Y,D) :- aresta(X,Y,D).
+connected(X,Y,D) :- aresta(Y,X,D).
 
 
+procuraProfundidade(Destino, Caminho, Custo) :- resolve_pp_c(Destino,C,Custo) ,  reverse(C, Caminho).
+
+resolve_pp_c(Nodo, [Nodo|Caminho], C) :-
+    profundidadeprimeiro(Nodo,[Nodo], Caminho , C).
+
+profundidadeprimeiro(Nodo,_,[],0) :- final(Nodo).
+profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
+    adjacente(Nodo,ProxNodo, C1),
+    not(member(ProxNodo,Historico)),
+    profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
