@@ -6,7 +6,6 @@
 :- dynamic estafeta/2.
 :- dynamic cliente/3.
 :- dynamic concluido/3.
-
 :- discontiguous estimaB/3.
 :- discontiguous estima/3.
 
@@ -58,28 +57,35 @@ concluido(9, 9, date(2021,6,9)).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
-encomenda(1, sameiro,     15,   5,  50,   pendente).
+encomenda(1, sameiro,     5,   5,  50,   pendente).
 encomenda(2, maximinos, 3,  10, 60,   caminho).
-encomenda(3, sameiro,     12,  67, 250,  pendente).             
+encomenda(3, bomJesus,     12,  67, 250,  pendente).             
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
 encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
 encomenda(7, bomJesus,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
 encomenda(9, saoVitor, 20, 2, 21, finalizada).
+encomenda(10,saoVicente, 8, 3, 20, pendente).   
+encomenda(11, vilaVerde, 12, 7, 25, pendente).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
 % Extensao do predicado entrega : IdEntrega, Data, IdEncomenda, Prazo, Transporte -> { V, F }
 entrega( 4, date(2021,10,2), 2, 13, bicicleta).
 entrega( 2, date(2021,10,3), 3, 1, moto).
-entrega( 1, date(2021,11,4), 1, 2, moto).
+entrega( 1, date(2021,11,4), 1, 3, moto).
 entrega( 3, date(2021,11,7), 6, 3, carro). 
 entrega( 5, date(2021,11,7), 4, 2, moto).
 entrega( 6, date(2021, 6,6), 5, 7, bicicleta).
 entrega( 7, date(2021, 6,4), 7, 8, carro).
 entrega( 8, date(2021, 9,10), 8, 5, carro).
 entrega( 9, date(2021, 6,1), 9, 20, carro).
+entrega( 10, date(2022, 1, 3), 10, 10, bicicleta).
+entrega( 11, date(2021, 12, 25), 11, 15, bicicleta).
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Estafeta
@@ -93,6 +99,8 @@ estafeta(maria,7).
 estafeta(andre,6).
 estafeta(luis,8).
 estafeta(andre,9).
+estafeta(andre, 10).
+estafeta(maria, 11).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Cliente
@@ -178,8 +186,26 @@ adjacente(Nodo, ProxNodo, C) :- aresta(ProxNodo, Nodo, C).
 connected(X,Y,D) :- aresta(X,Y,D).
 connected(X,Y,D) :- aresta(Y,X,D).
 
+%------------Profundidade DFS-----------------------------
 
-procuraProfundidade(Destino, Caminho, Custo) :- resolve_pp_c(Destino,C,Custo) ,  reverse(C, Caminho).
+algoritmoDFS(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoDFSAux(IdEncomenda, Circuito)), X).
+
+
+algoritmoDFSAux(IdEncomenda,Caminho) :- encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
+                             entrega(_, _, IdEncomenda, Prazo, _),
+                             procuraProfundidade(Freguesia, Caminho, Custo),
+                             escolheTransporte(Peso, Custo, Prazo, Transporte),
+                             calculaTempo(Transporte, Peso, Custo, Tempo),
+                             printCircuito(Caminho,Custo,Tempo,Transporte),!.
+
+
+printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
+	write('Caminho = '),writeln(Caminho),
+	write('Distancia = '),write(Distancia),writeln(' km'),
+	write('Tempo de entrega = '),write(TempoEntrega),writeln(' horas'),
+	write('Tipo de transporte = '),writeln(Transporte),writeln('').
+
+procuraProfundidade(Destino, Caminho, Custo) :- resolve_pp_c(Destino,C,Custo),reverse(C, Caminho).
 
 resolve_pp_c(Nodo, [Nodo|Caminho], C) :-
     profundidadeprimeiro(Nodo,[Nodo], Caminho , C).
@@ -190,6 +216,25 @@ profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
     not(member(ProxNodo,Historico)),
     profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
 
+
+%------------Auxiliares-----------------------------
+
+escolheTransporte(Peso, Custo, Prazo, bicicleta) :- Peso =< 5, calculaTempo(bicicleta, Peso, Custo, Tempo) , Tempo =< Prazo.
+escolheTransporte(Peso, Custo, Prazo, moto) :- Peso =< 20, calculaTempo(moto, Peso, Custo, Tempo) , Tempo =< Prazo.
+escolheTransporte(Peso, Custo, Prazo, carro) :- Peso =< 100, calculaTempo(carro, Peso, Custo, Tempo) , Tempo =< Prazo.
+        
+
+calculaTempo(carro,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (25 - (0.1 * Peso)),
+    Tempo is (Distancia / VelocidadeMedia).
+
+calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (10 - (0.7 * Peso)),
+    Tempo is (Distancia / VelocidadeMedia).
+
+calculaTempo(moto,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (35 - (0.5 * Peso)),
+    Tempo is (Distancia / VelocidadeMedia).
 %------------Largura BFS-----------------------------
 
 %Largura (BFS - Breadth-First Search)
