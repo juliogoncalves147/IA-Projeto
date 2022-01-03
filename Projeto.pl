@@ -252,6 +252,17 @@ custo([A,B|T],Custo) :- move(A,B,C),
         Custo is NewCusto+C.
 
 %------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
+algoritmoAP(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoAPAux(IdEncomenda, Circuito)), X).
+
+
+algoritmoAPAux(IdEncomenda,Caminho) :-  encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
+                                        entrega(_, _, IdEncomenda, Prazo, _),
+                                        aprofundamentoProgress(Freguesia, Caminho, Custo),
+                                        escolheTransporte(Peso, Custo, Prazo, Transporte),
+                                        calculaTempo(Transporte, Peso, Custo, Tempo),
+                                        printCircuito(Caminho,Custo,Tempo,Transporte),!.
+
+
 limite(50). %custo máximo do caminho em profundidade 
 
 aprofundamentoProgress(Destino,Caminho,Custo):- limitadaAux(Destino,Caminho,0,Custo). 
