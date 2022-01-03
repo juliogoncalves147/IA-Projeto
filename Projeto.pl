@@ -69,7 +69,7 @@ encomenda(7, bomJesus,     30,   4,  42,   finalizada).
 encomenda(8, merelim,   35,   3,  25,   caminho).
 encomenda(9, saoVitor, 20, 2, 21, finalizada).
 encomenda(10,saoVicente, 8, 3, 20, pendente).   
-encomenda(11, vilaVerde, 12, 7, 25, pendente).
+encomenda(11, vilaVerde, 5, 7, 25, pendente).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
@@ -240,7 +240,16 @@ seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT).
 %------------Largura BFS-----------------------------
 %Largura (BFS - Breadth-First Search)
 
-larguraprimeiroBF(Orig, Dest, Cam,Custo):- larguraprimeiro(Dest,[[Orig]],Cam),
+algoritmoBFS(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoBFSAux(IdEncomenda, Circuito)), X).
+
+algoritmoBFSAux(IdEncomenda,Caminho) :-    encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
+                                        entrega(_, _, IdEncomenda, Prazo, _),
+                                        larguraprimeiroBF(Freguesia, Caminho, Custo),
+                                        escolheTransporte(Peso, Custo, Prazo, Transporte),
+                                        calculaTempo(Transporte, Peso, Custo, Tempo),
+                                        printCircuito(Caminho,Custo,Tempo,Transporte),!.
+
+larguraprimeiroBF(Dest, Cam,Custo):- larguraprimeiro(Dest,[[centroDeRecolha]],Cam),
         custo(Cam,Custo).
 
 larguraprimeiro(Dest, [[Dest|Tail]|_], Caminho) :- reverse([Dest|Tail],Caminho).
