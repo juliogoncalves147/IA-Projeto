@@ -1,166 +1,114 @@
-gulosa1entrega(Nodo,Peso,Prazo,CaminhoD/CustoD,CaminhoT/CustoT) :-
-    resolve_gulosa(Nodo,carro,Peso,CaminhoD1/CustoD1,CaminhoT1/CustoT1),
-    resolve_gulosa(Nodo,moto,Peso,CaminhoD2/CustoD2,CaminhoT2/CustoT2),
-    resolve_gulosa(Nodo,bicicleta,Peso,CaminhoD3/CustoD3,CaminhoT3/CustoT3).
-
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------
 
-resolve_gulosa(Nodo, carro, Peso, CaminhoD/CustoD, CaminhoT/CustoT ) :-
+resolve_gulosa(Nodo, carro, Peso, Caminho) :-
     Peso =< 100,
     estimaC(Nodo,EstimaKm,EstimaTmp),
-    agulosaDcarro([[Nodo]/0/EstimaKm],InvCaminhoD/CustoD/_),
-    agulosaTcarro([[Nodo]/0/EstimaTmp],InvCaminhoT/CustoT/_,Peso),
-    reverse(InvCaminhoD,CaminhoD),
-    reverse(InvCaminhoT,CaminhoT).
+    agulosaCarro([[Nodo]/EstimaKm/EstimaTmp],InvCaminhoD/_/_),
+    reverse(InvCaminhoD,Caminho).
 
-resolve_gulosa(Nodo, moto, Peso, CaminhoD/CustoD, CaminhoT/CustoT ) :-
+resolve_gulosa(Nodo, moto, Peso, Caminho) :-
     Peso =< 20,
     estimaM(Nodo,EstimaKm,EstimaTmp),
-    agulosaDbic([[Nodo]/0/EstimaKm],InvCaminhoD/CustoD/_),
-    agulosaTbic([[Nodo]/0/EstimaTmp],InvCaminhoT/CustoT/_,Peso),
-    reverse(InvCaminhoD,CaminhoD),
-    reverse(InvCaminhoT,CaminhoT).
+    agulosaMoto([[Nodo]/EstimaKm/EstimaTmp],InvCaminhoD/_/_),
+    reverse(InvCaminhoD,Caminho).
 
-resolve_gulosa(Nodo, bicicleta, Peso, CaminhoD/CustoD, CaminhoT/CustoT ) :-
+resolve_gulosa(Nodo, bicicleta, Peso, Caminho) :-
     Peso =< 5,
     estimaB(Nodo,EstimaKm,EstimaTmp),
-    agulosaDbic([[Nodo]/0/EstimaKm],InvCaminhoD/CustoD/_),
-    agulosaTbic([[Nodo]/0/EstimaTmp],InvCaminhoT/CustoT/_,Peso),
-    reverse(InvCaminhoD,CaminhoD),
-    reverse(InvCaminhoT,CaminhoT).
+    agulosaBic([[Nodo]/EstimaKm/EstimaTmp],InvCaminhoD/_/_),
+    reverse(InvCaminhoD,Caminho).
+
 
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  CARRO  ------------------------------------------
 
-agulosaDcarro(Caminhos,Caminho) :-
+agulosaCarro(Caminhos,Caminho) :-
     obtem_melhor_g(Caminhos,Caminho),
     Caminho = [Nodo|_]/_/_,
     final(Nodo).
-agulosaDcarro(Caminhos,SolucaoCaminho) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho),
+agulosaCarro(Caminhos,SolucaoCaminho) :-
+    obtem_melhor(Caminhos,MelhorCaminho),
     seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaDcarro(MelhorCaminho,ExpCaminhos),
+    expande_gulosaCarro(MelhorCaminho,ExpCaminhos),
     append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaDcarro(NovoCaminhos,SolucaoCaminho). 
+    agulosaCarro(NovoCaminhos,SolucaoCaminho).
 
-agulosaTcarro(Caminhos,Caminho,_) :-
-    obtem_melhor_g(Caminhos,Caminho),
-    Caminho = [Nodo|_]/_/_,
-    final(Nodo).
-agulosaTcarro(Caminhos,SolucaoCaminho,Peso) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho),
-    seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaTcarro(MelhorCaminho,ExpCaminhos,Peso),
-    append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaTcarro(NovoCaminhos,SolucaoCaminho,Peso).    
-    
-expande_gulosaDcarro(Caminho,ExpCaminhos) :-
-    findall(NovoCaminho, (adjacente2Dcarro(Caminho,NovoCaminho)) , ExpCaminhos).
+expande_gulosaCarro(Caminho,ExpCaminhos) :-
+    findall(NovoCaminho, (adjacenteCarro(Caminho,NovoCaminho)), ExpCaminhos).
 
-expande_gulosaTcarro(Caminho,ExpCaminhos,Peso) :-
-    findall(NovoCaminho, (adjacente2Tcarro(Caminho,NovoCaminho,Peso)) , ExpCaminhos).
-
-adjacente2Dcarro([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstKm) :-
-    move(Nodo,ProxNodo,PassoCustoKm),
+adjacenteCarro([Nodo|Caminho]/_/_,[ProxNodo,Nodo|Caminho]/EstKm/EstTmp) :-
+    move(Nodo,ProxNodo,_),
     \+member(ProxNodo,Caminho),
-    NovoCusto is Custo + PassoCustoKm,
-    estimaC(ProxNodo,EstKm,_).
+    estimaC(ProxNodo,EstKm,EstTmp).
 
-adjacente2Tcarro([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstTmp,Peso) :-
-    move(Nodo,ProxNodo,PassoCustoKm),
-    calculaTempo(carro,Peso,PassoCustoKm,PassoCustoTmp),
-    \+member(ProxNodo,Caminho),
-    NovoCusto is Custo + PassoCustoTmp,
-    estimaC(ProxNodo,_,EstTmp).
+obtem_melhorCarro([Caminho],Caminho) :- !.
+obtem_melhorCarro([Caminho1/EstKm1/EstTmp1,_/EstKm2/EstTmmp2|Caminhos],MelhorCaminho) :-
+    Produtividade1 is 0.3 * EstKm1 + 0.7 * EstTmp1 ,Produtividade2 is 0.3 * EstKm2 + 0.7 * EstTmp2 ,
+    Produtividade1 =< Produtividade2 , !,
+    obtem_melhorCarro([Caminho1/EstKm1/EstTmp1|Caminhos],MelhorCaminho).
+obtem_melhorCarro([_|Caminhos],MelhorCaminho) :-
+    obtem_melhorCarro(Caminhos,MelhorCaminho).
 
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  MOTO  ------------------------------------------
 
-agulosaDmoto(Caminhos,Caminho) :-
+agulosaMoto(Caminhos,Caminho) :-
     obtem_melhor_g(Caminhos,Caminho),
     Caminho = [Nodo|_]/_/_,
     final(Nodo).
-agulosaDmoto(Caminhos,SolucaoCaminho) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho),
+agulosaMoto(Caminhos,SolucaoCaminho) :-
+    obtem_melhorMoto(Caminhos,MelhorCaminho),
     seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaDmoto(MelhorCaminho,ExpCaminhos),
+    expande_gulosaMoto(MelhorCaminho,ExpCaminhos),
     append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaDmoto(NovoCaminhos,SolucaoCaminho).
+    agulosaMoto(NovoCaminhos,SolucaoCaminho).
 
-agulosaTmoto(Caminhos,Caminho,_) :-
-    obtem_melhor_g(Caminhos,Caminho),
-    Caminho = [Nodo|_]/_/_,
-    final(Nodo).
-agulosaTmoto(Caminhos,SolucaoCaminho,Peso) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho),
-    seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaTmoto(MelhorCaminho,ExpCaminhos,Peso),
-    append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaTmoto(NovoCaminhos,SolucaoCaminho,Peso).    
-    
-expande_gulosaDmoto(Caminho,ExpCaminhos) :-
-    findall(NovoCaminho, (adjacente2Dmoto(Caminho,NovoCaminho)) , ExpCaminhos).
+expande_gulosaMoto(Caminho,ExpCaminhos) :-
+    findall(NovoCaminho, (adjacenteMoto(Caminho,NovoCaminho)), ExpCaminhos).
 
-expande_gulosaTmoto(Caminho,ExpCaminhos,Peso) :-
-    findall(NovoCaminho, (adjacente2Tmoto(Caminho,NovoCaminho,Peso)) , ExpCaminhos).
-
-adjacente2Dmoto([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstKm) :-
-    move(Nodo,ProxNodo,PassoCustoKm),
+adjacenteMoto([Nodo|Caminho]/_/_,[ProxNodo,Nodo|Caminho]/EstKm/EstTmp) :-
+    move(Nodo,ProxNodo,_),
     \+member(ProxNodo,Caminho),
-    NovoCusto is Custo + PassoCustoKm,
-    estimaM(ProxNodo,EstKm,_).
+    estimaM(ProxNodo,EstKm,EstTmp).
 
-adjacente2Tmoto([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstTmp,Peso) :-
-    move(Nodo,ProxNodo,PassoCustoKm),
-    calculaTempo(moto,Peso,PassoCustoKm,PassoCustoTmp),
-    \+member(ProxNodo,Caminho),
-    NovoCusto is Custo + PassoCustoTmp,
-    estimaM(ProxNodo,_,EstTmp).
+obtem_melhorMoto([Caminho],Caminho) :- !.
+obtem_melhorMoto([Caminho1/EstKm1/EstTmp1,_/EstKm2/EstTmmp2|Caminhos],MelhorCaminho) :-
+    Produtividade1 is 0.3 * EstKm1 + 0.7 * EstTmp1 ,Produtividade2 is 0.3 * EstKm2 + 0.7 * EstTmp2 ,
+    Produtividade1 =< Produtividade2 , !,
+    obtem_melhorMoto([Caminho1/EstKm1/EstTmp1|Caminhos],MelhorCaminho).
+obtem_melhorMoto([_|Caminhos],MelhorCaminho) :-
+    obtem_melhorMoto(Caminhos,MelhorCaminho).
 
 %------------------------------------------------------------------------------------------------
-%---------------------------------------------  BICICLETA  --------------------------------------
+%---------------------------------------------BICICLETA------------------------------------------
 
-agulosaDbic(Caminhos,Caminho) :-
-    obtem_melhor_g(Caminhos,Caminho),
+agulosaBic(Caminhos,Caminho) :-
+    obtem_melhorBic(Caminhos,Caminho),
     Caminho = [Nodo|_]/_/_,
     final(Nodo).
-agulosaDbic(Caminhos,SolucaoCaminho) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho),
+agulosaBic(Caminhos,SolucaoCaminho) :-
+    obtem_melhorBic(Caminhos,MelhorCaminho),
     seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaDbic(MelhorCaminho,ExpCaminhos),
+    expande_gulosaBic(MelhorCaminho,ExpCaminhos),
     append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaDbic(NovoCaminhos,SolucaoCaminho). 
+    agulosaBic(NovoCaminhos,SolucaoCaminho).
 
-agulosaTbic(Caminhos,Caminho,_) :-
-    obtem_melhor_g(Caminhos,Caminho),
-    Caminho = [Nodo|_]/_/_,
-    final(Nodo).
-agulosaTbic(Caminhos,SolucaoCaminho,Peso) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho),
-    seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaTbic(MelhorCaminho,ExpCaminhos,Peso),
-    append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaTbic(NovoCaminhos,SolucaoCaminho,Peso).    
-    
-expande_gulosaDbic(Caminho,ExpCaminhos) :-
-    findall(NovoCaminho, (adjacente2Dbic(Caminho,NovoCaminho)) , ExpCaminhos).
+expande_gulosaBic(Caminho,ExpCaminhos) :-
+    findall(NovoCaminho, (adjacenteBic(Caminho,NovoCaminho)), ExpCaminhos).
 
-expande_gulosaTbic(Caminho,ExpCaminhos,Peso) :-
-    findall(NovoCaminho, (adjacente2Tbic(Caminho,NovoCaminho,Peso)) , ExpCaminhos).
-
-adjacente2Dbic([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstKm) :-
-    move(Nodo,ProxNodo,PassoCustoKm),
+adjacenteBic([Nodo|Caminho]/_/_,[ProxNodo,Nodo|Caminho]/EstKm/EstTmp) :-
+    move(Nodo,ProxNodo,_),
     \+member(ProxNodo,Caminho),
-    NovoCusto is Custo + PassoCustoKm,
-    estimaB(ProxNodo,EstKm,_).
+    estimaB(ProxNodo,EstKm,EstTmp).
 
-adjacente2Tbic([Nodo|Caminho]/Custo/_,[ProxNodo,Nodo|Caminho]/NovoCusto/EstTmp,Peso) :-
-    move(Nodo,ProxNodo,PassoCustoKm),
-    calculaTempo(bicicleta,Peso,PassoCustoKm,PassoCustoTmp),
-    \+member(ProxNodo,Caminho),
-    NovoCusto is Custo + PassoCustoTmp,
-    estimaB(ProxNodo,_,EstTmp).
+obtem_melhorBic([Caminho],Caminho) :- !.
+obtem_melhorBic([Caminho1/EstKm1/EstTmp1,_/EstKm2/EstTmmp2|Caminhos],MelhorCaminho) :-
+    Produtividade1 is 0.8 * EstKm1 + 0.2 * EstTmp1 ,Produtividade2 is 0.8 * EstKm2 + 0.2 * EstTmp2 ,
+    Produtividade1 =< Produtividade2 , !,
+    obtem_melhorBic([Caminho1/EstKm1/EstTmp1|Caminhos],MelhorCaminho).
+obtem_melhorBic([_|Caminhos],MelhorCaminho) :-
+    obtem_melhorBic(Caminhos,MelhorCaminho).
 
 %-----------------------------------------------------------------------------------------------
 %--------------------------------------     GLOBAIS    -----------------------------------------
@@ -186,12 +134,6 @@ calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
 calculaTempo(moto,Peso,Distancia,Tempo) :-
     VelocidadeMedia is (35 - (0.5 * Peso)),
     Tempo is (Distancia / VelocidadeMedia).
-
-%obtem_melhor_c([Caminho/Custo/Veiculo],Caminho/Custo/Veiculo) :- !.
-%obtem_melhor_c([Caminho1/Custo1/Veiculo1,_/Custo2/_|Caminhos],MelhorCaminho) :-
-%    Custo1 =< Custo2, !,
-%    obtem_melhor_c([Caminho1/Custo1/Veiculo1|Caminhos],MelhorCaminho).
-%obtem_melhor_c([_|Caminhos])
 
 move(X,Y,Custo) :- aresta(X,Y,Custo).
 move(X,Y,Custo) :- aresta(Y,X,Custo).
