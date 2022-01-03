@@ -195,13 +195,13 @@ profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
 %Largura (BFS - Breadth-First Search)
 larguraprimeiroBF(Orig, Dest, Cam):- larguraprimeiro(Dest,[[Orig]],Cam).
 
-larguraprimeiro(Dest, [[Dest|Tail]|_],Caminho) :- reverse([Dest|Tail],Caminho).
+larguraprimeiro(Dest, [[Dest|Tail]|_], Caminho) :- reverse([Dest|Tail],Caminho).
 larguraprimeiro(Dest, [Largura|Outros], Caminho) :- 
-        Largura=[NodoAtual|_],
-        findall([X|Largura],
-        (Dest==NodoAtual, aresta(NodoAtual,X,Custo), not(member(X,Largura))), Novos),
-        append(Outros, Novos, Todos),
-        larguraprimeiro(Dest, Todos, Caminho).
+    Largura=[NodoAtual|_],
+    findall([X|Largura],
+    (Dest\==NodoAtual, aresta(NodoAtual,X,_), not(member(X,Largura))), Novos),
+    append(Outros, Novos, Todos),
+    larguraprimeiro(Dest, Todos, Caminho).
 
 
 %------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
