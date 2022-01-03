@@ -179,10 +179,6 @@ membro(X, [X|_]).
 membro(X, [_|Xs]):-
 	membro(X, Xs).
 
-adjacente(Nodo, ProxNodo, C) :- aresta(Nodo, ProxNodo, C).
-adjacente(Nodo, ProxNodo, C) :- aresta(ProxNodo, Nodo, C).
-
-
 connected(X,Y,D) :- aresta(X,Y,D).
 connected(X,Y,D) :- aresta(Y,X,D).
 
@@ -212,7 +208,7 @@ resolve_pp_c(Nodo, [Nodo|Caminho], C) :-
 
 profundidadeprimeiro(Nodo,_,[],0) :- final(Nodo).
 profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
-    adjacente(Nodo,ProxNodo, C1),
+    move(Nodo,ProxNodo, C1),
     not(member(ProxNodo,Historico)),
     profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
 
@@ -236,17 +232,27 @@ calculaTempo(moto,Peso,Distancia,Tempo) :-
     VelocidadeMedia is (35 - (0.5 * Peso)),
     Tempo is (Distancia / VelocidadeMedia).
 %------------Largura BFS-----------------------------
-
 %Largura (BFS - Breadth-First Search)
-larguraprimeiroBF(Orig, Dest, Cam):- larguraprimeiro(Dest,[[Orig]],Cam).
+
+larguraprimeiroBF(Orig, Dest, Cam,Custo):- larguraprimeiro(Dest,[[Orig]],Cam),
+        custo(Cam,Custo).
 
 larguraprimeiro(Dest, [[Dest|Tail]|_], Caminho) :- reverse([Dest|Tail],Caminho).
 larguraprimeiro(Dest, [Largura|Outros], Caminho) :- 
     Largura=[NodoAtual|_],
     findall([X|Largura],
-    (Dest\==NodoAtual, aresta(NodoAtual,X,_), not(member(X,Largura))), Novos),
+    (Dest\==NodoAtual, move(NodoAtual,X,_), not(member(X,Largura))), Novos),
     append(Outros, Novos, Todos),
     larguraprimeiro(Dest, Todos, Caminho).
+
+
+custo([A,B],Custo) :- move(A,B,Custo).
+custo([A,B|T],Custo) :- move(A,B,C),
+        custo([B|T],NewCusto),
+        Custo is NewCusto+C.
+
+move(X,Y,Custo) :- aresta(X,Y,Custo).
+move(X,Y,Custo) :- aresta(Y,X,Custo).
 
 
 %------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
@@ -256,7 +262,7 @@ aprofundamentoProgress(Destino,Caminho,Custo):- limitadaAux(Destino,Caminho,0,Cu
 
 limitadaAux(_,_,Y,_):- limite(K), K=<Y, fail.
 limitadaAux(Destino,Caminho,Iter,Custo):- limitadaProfundidade(Destino,Caminho,Iter,Custo),!.
-limitadaAux(Destino,Caminho,Iter,Custo):- write(Iter), limite(Y), Iter<Y ,X is Iter+1 ,limitadaAux(Destino,Caminho,X,Custo).
+limitadaAux(Destino,Caminho,Iter,Custo):- limite(Y), Iter<Y ,X is Iter+1 ,limitadaAux(Destino,Caminho,X,Custo).
 
 limitadaProfundidade(Destino,Caminho,Limite,Custo):-
         procuraProfundidade(Destino,Caminho,Custo), Custo > 0 , Custo=<Limite.
