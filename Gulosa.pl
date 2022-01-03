@@ -135,17 +135,3 @@ obtem_melhor_g([Caminho1/Custo1/Est1,_/_/Est2|Caminhos],MelhorCaminho) :-
 obtem_melhor_g([_|Caminhos],MelhorCaminho) :-
     obtem_melhor_g(Caminhos,MelhorCaminho).
 
-seleciona(H,[H|T],T).
-seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT). 
-
-calculaTempo(carro,Peso,Distancia,Tempo) :-
-    VelocidadeMedia is (25 - (0.1 * Peso)),
-    Tempo is (Distancia / VelocidadeMedia).
-
-calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
-    VelocidadeMedia is (10 - (0.7 * Peso)),
-    Tempo is (Distancia / VelocidadeMedia).
-
-calculaTempo(moto,Peso,Distancia,Tempo) :-
-    VelocidadeMedia is (35 - (0.5 * Peso)),
-    Tempo is (Distancia / VelocidadeMedia).

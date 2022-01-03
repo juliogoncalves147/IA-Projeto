@@ -8,6 +8,8 @@
 :- dynamic concluido/3.
 :- discontiguous estimaB/3.
 :- discontiguous estima/3.
+:- include('Gulosa.pl').
+:- include('Aestrela.pl').
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -231,6 +233,10 @@ calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
 calculaTempo(moto,Peso,Distancia,Tempo) :-
     VelocidadeMedia is (35 - (0.5 * Peso)),
     Tempo is (Distancia / VelocidadeMedia).
+
+seleciona(H,[H|T],T).
+seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT). 
+
 %------------Largura BFS-----------------------------
 %Largura (BFS - Breadth-First Search)
 
