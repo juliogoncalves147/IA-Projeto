@@ -179,8 +179,8 @@ membro(X, [X|_]).
 membro(X, [_|Xs]):-
 	membro(X, Xs).
 
-connected(X,Y,D) :- aresta(X,Y,D).
-connected(X,Y,D) :- aresta(Y,X,D).
+move(X,Y,Custo) :- aresta(X,Y,Custo).
+move(X,Y,Custo) :- aresta(Y,X,Custo).
 
 %------------Profundidade DFS-----------------------------
 
@@ -250,10 +250,6 @@ custo([A,B],Custo) :- move(A,B,Custo).
 custo([A,B|T],Custo) :- move(A,B,C),
         custo([B|T],NewCusto),
         Custo is NewCusto+C.
-
-move(X,Y,Custo) :- aresta(X,Y,Custo).
-move(X,Y,Custo) :- aresta(Y,X,Custo).
-
 
 %------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
 limite(50). %custo máximo do caminho em profundidade 
