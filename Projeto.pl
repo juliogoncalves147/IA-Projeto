@@ -221,8 +221,7 @@ listadeRotas(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, I
                                                     verificaValido(IdsOrdenados, Caminho, 0, Transporte).
                 
 
-
-verificaValido([X],[Y],Tempo, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, _).
+verificaValido([X],[Y],Tempo, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, TempoFinal).
 verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, bicicleta) :- verificaCaminho(IdsEncomenda, Caminho, bicicleta, Tempo, TempoFinal),
                                                                                   verificaValido(Encomendas, Caminhos, TempoFinal, bicicleta).
 verificaValido([X],[Y],Tempo, moto) :- verificaCaminho(X,Y, moto, Tempo, _).
