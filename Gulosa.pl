@@ -59,7 +59,7 @@ obtem_melhorCarro([Caminho],Caminho) :- !.
 obtem_melhorCarro([Caminho1/EstKm1/EstTmp1,_/EstKm2/EstTmp2|Caminhos],MelhorCaminho) :-
     Produtividade1 is 0.3 * EstKm1 + 0.7 * EstTmp1,
     Produtividade2 is 0.3 * EstKm2 + 0.7 * EstTmp2,
-    Produtividade1 =< Produtividade2 , !,
+    Produtividade1 < Produtividade2 , !,
     obtem_melhorCarro([Caminho1/EstKm1/EstTmp1|Caminhos],MelhorCaminho).
 obtem_melhorCarro([_|Caminhos],MelhorCaminho) :-
     obtem_melhorCarro(Caminhos,MelhorCaminho).

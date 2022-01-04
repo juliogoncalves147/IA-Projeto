@@ -24,12 +24,14 @@ printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
 	write('Tipo de transporte = '),writeln(Transporte),writeln('').*/
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------
+exactHeuristicCarro(Nodo,Nodo,_,0,0) :- Nodo == Nodo,!.
+exactHeuristicCarro(NodoI,NodoF,Peso,EstimaKm,EstimaTmp) :-
+    aprofundamentoProgress(NodoI,NodoF,_,EstimaKm),
+    calculaTempo(carro,Peso,EstimaKm,EstimaTmp).
 
 resolve_gulosa2(NodoI, NodoF, carro, Peso, Caminho) :-
     Peso =< 100,
-    procuraProfundidadeVarios(NodoI, NodoF, CaminhoAux),
-    custo(CaminhoAux,EstimaKm),
-    calculaTempo(carro,Peso,EstimaKm,EstimaTmp),
+    exactHeuristicCarro(NodoI,NodoF,Peso,EstimaKm,EstimaTmp),
     agulosaCarro2([[NodoF]/EstimaKm/EstimaTmp], Caminho/_/_, NodoI, Peso).
 /*
 resolve_gulosa2(NodoI, NodoF, moto, Peso, Caminho) :-
@@ -64,9 +66,7 @@ expande_gulosaCarro2(Caminho,ExpCaminhos,NodoI,Peso) :-
 adjacenteCarro2([Nodo|Caminho]/_/_, [ProxNodo,Nodo|Caminho]/EstKm/EstTmp, NodoI, Peso) :-
     move(Nodo,ProxNodo,_),
     \+member(ProxNodo,Caminho),
-    procuraProfundidadeVarios(NodoI, ProxNodo, CaminhoAux),
-    custo(CaminhoAux,EstKm),
-    calculaTempo(carro,Peso,EstKm,EstTmp).
+    exactHeuristicCarro(NodoI,ProxNodo,Peso,EstKm,EstTmp).
 
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  MOTO  ------------------------------------------
