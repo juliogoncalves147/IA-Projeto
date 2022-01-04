@@ -195,7 +195,7 @@ containsAll([],_).
 containsAll([H|T], L1):- member(H,L1),containsAll(T,L1).
 */
 
-getPrazo(IdEncomenda, Prazo) :- entrega(IdEntrega,_,IdEncomenda, Prazo,_).
+getPrazo(IdEncomenda, Prazo) :- entrega(_,_,IdEncomenda, Prazo,_).
 getFreguesia(IdEncomenda, Freguesia) :- encomenda(IdEncomenda, Freguesia,_,_,_,_).
 
 ordenaPrazo([], []).
@@ -289,12 +289,12 @@ algoritmoBFS(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,
 
 algoritmoBFSAux(IdEncomenda,Caminho) :- encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
                                         entrega(_, _, IdEncomenda, Prazo, _),
-                                        larguraprimeiroBF(Freguesia, Caminho, Custo),
+                                        larguraprimeiroBF(centroDeRecolha ,Freguesia, Caminho, Custo),
                                         escolheTransporte(Peso, Custo, Prazo, Transporte),
                                         calculaTempo(Transporte, Peso, Custo, Tempo),
                                         printCircuito(Caminho,Custo,Tempo,Transporte),!.
 
-larguraprimeiroBF(Dest, Cam,Custo):- larguraprimeiro(Dest,[[centroDeRecolha]],Cam),
+larguraprimeiroBF(Orig,Dest, Cam,Custo):- larguraprimeiro(Dest,[[Orig]],Cam),!,
         custo(Cam,Custo).
 
 larguraprimeiro(Dest, [[Dest|Tail]|_], Caminho) :- reverse([Dest|Tail],Caminho).
@@ -334,7 +334,31 @@ limitadaAux(Destino,Caminho,Iter,Custo):- limite(Y), Iter<Y ,X is Iter+1 ,limita
 limitadaProfundidade(Destino,Caminho,Limite,Custo):-
         procuraProfundidade(Destino,Caminho,Custo), Custo > 0 , Custo=<Limite.
 
+%----------------Dividir lista BFS
 
+buscarPrimeirosXelementos(0,_,[]).
+buscarPrimeirosXelementos(_,[],[]).
+buscarPrimeirosXelementos(N,[H|T],[H|T1]) :- N>=0, N1 is N-1, buscarPrimeirosXelementos(N1,T,T1).
+
+buscarUltimosXelementos(N,L,R):- reverse(L,L1), buscarPrimeirosXelementos(N, L1 ,LR), reverse(LR,R).
+
+calcDistIdBF(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), larguraprimeiroBF( FA,FB,_,Distancia).
+
+seconds([],[]). %lista de pares -> lista com os segundos elementos de cada par
+seconds([(_,B)|T], [B|Tail]):-seconds(T,Tail).
+                        
+ordenaPorDistanciaBF(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdBF(IdHead,Id,Distancia)),List),
+                                                msort(List,Sorted),
+                                                seconds(Sorted,Ans). %so testei com o 1,3,10,11
+
+
+splitPorDistancia([H|T],[H|T1],[T2]) :- ordenaPorDistanciaBF(H,T,Lista), %Isto ainda nao funciona
+                        length(T,Comp),
+                        CompTotal is Comp + 1,
+                        mod(CompTotal,2) =:= 0,
+                        PrimeirosElementos is CompTotal / 2 - 1,
+                        buscarPrimeirosXelementos(PrimeirosElementos,Lista,T1),
+                        buscarUltimosXelementos(PrimeirosElementos,Lista,T2).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
