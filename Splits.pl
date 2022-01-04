@@ -1,4 +1,3 @@
-:- include('Projeto.pl').
 
 %----------------Dividir lista BFS
 
