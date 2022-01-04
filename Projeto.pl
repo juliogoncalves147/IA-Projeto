@@ -222,30 +222,30 @@ listadeRotas(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, I
                 
 
 
-verificaValido([X],[Y],Tempo, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, TempoFinal).
+verificaValido([X],[Y],Tempo, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, _).
 verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, bicicleta) :- verificaCaminho(IdsEncomenda, Caminho, bicicleta, Tempo, TempoFinal),
                                                                                   verificaValido(Encomendas, Caminhos, TempoFinal, bicicleta).
-verificaValido([X],[Y],Tempo, moto) :- verificaCaminho(X,Y, moto, Tempo, TempoFinal).
+verificaValido([X],[Y],Tempo, moto) :- verificaCaminho(X,Y, moto, Tempo, _).
 verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, moto) :- verificaCaminho(IdsEncomenda, Caminho, moto, Tempo, TempoFinal),
                                                                                   verificaValido(Encomendas, Caminhos, TempoFinal,moto).
-verificaValido([X],[Y],Tempo, carro) :- verificaCaminho(X,Y, carro, Tempo, TempoFinal).
+verificaValido([X],[Y],Tempo, carro) :- verificaCaminho(X,Y, carro, Tempo, _).
 verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, carro) :- verificaCaminho(IdsEncomenda, Caminho, carro, Tempo, TempoFinal),
                                                                                   verificaValido(Encomendas, Caminhos, TempoFinal, carro).
                                                                                                                                
 
 verificaCaminho(IdEncomenda, Caminho, bicicleta, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 5,
                                                                        getPrazo(IdEncomenda,Prazo),
-                                                                       calculaTempo(Transporte,Peso, Custo, TempoRota),
+                                                                       calculaTempo(_,Peso, Custo, TempoRota),
                                                                        Prazo >= TempoRota + Tempo,
                                                                        TempoFinal is (TempoRota + Tempo).
 verificaCaminho(IdEncomenda, Caminho, moto, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 20,
                                                                         getPrazo(IdEncomenda,Prazo),
-                                                                        calculaTempo(Transporte,Peso, Custo, TempoRota),
+                                                                        calculaTempo(_,Peso, Custo, TempoRota),
                                                                         Prazo >= TempoRota + Tempo,
                                                                         TempoFinal is (TempoRota + Tempo).
 verificaCaminho(IdEncomenda, Caminho, carro, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 100,
                                                                         getPrazo(IdEncomenda,Prazo),
-                                                                        calculaTempo(Transporte,Peso, Custo, TempoRota),
+                                                                        calculaTempo(_,Peso, Custo, TempoRota),
                                                                         Prazo >= TempoRota + Tempo,
                                                                         TempoFinal is (TempoRota + Tempo).                                                                        
 
@@ -350,7 +350,7 @@ algoritmoAP(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_
 
 algoritmoAPAux(IdEncomenda,Caminho) :-  encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
                                         entrega(_, _, IdEncomenda, Prazo, _),
-                                        aprofundamentoProgress(Freguesia, Caminho, Custo),
+                                        aprofundamentoProgress(centroDeRecolha,Freguesia, Caminho, Custo),
                                         escolheTransporte(Peso, Custo, Prazo, Transporte),
                                         calculaTempo(Transporte, Peso, Custo, Tempo),
                                         printCircuito(Caminho,Custo,Tempo,Transporte),!.
@@ -358,14 +358,14 @@ algoritmoAPAux(IdEncomenda,Caminho) :-  encomenda(IdEncomenda, Freguesia, Peso, 
 
 limite(50). %custo máximo do caminho em profundidade 
 
-aprofundamentoProgress(Destino,Caminho,Custo):- limitadaAux(Destino,Caminho,0,Custo). 
+aprofundamentoProgress(Origem,Destino,Caminho,Custo):- limitadaAux(Origem,Destino,Caminho,0,Custo). 
 
-limitadaAux(_,_,Y,_):- limite(K), K=<Y, fail.
-limitadaAux(Destino,Caminho,Iter,Custo):- limitadaProfundidade(Destino,Caminho,Iter,Custo),!.
-limitadaAux(Destino,Caminho,Iter,Custo):- limite(Y), Iter<Y ,X is Iter+1 ,limitadaAux(Destino,Caminho,X,Custo).
+limitadaAux(_,_,_,Y,_):- limite(K), K=<Y, fail.
+limitadaAux(Origem,Destino,Caminho,Iter,Custo):- limitadaProfundidade(Origem,Destino,Caminho,Iter,Custo),!.
+limitadaAux(Origem,Destino,Caminho,Iter,Custo):- limite(Y), Iter<Y ,X is Iter+1 ,limitadaAux(Origem,Destino,Caminho,X,Custo).
 
-limitadaProfundidade(Destino,Caminho,Limite,Custo):-
-        procuraProfundidade(Destino,Caminho,Custo), Custo > 0 , Custo=<Limite.
+limitadaProfundidade(Origem,Destino,Caminho,Limite,Custo):-
+        procuraProfundidadeVarios(Origem,Destino,Caminho),custo(Caminho,Custo), Custo > 0 , Custo=<Limite.
 
 %----------------Dividir lista BFS
 
@@ -383,11 +383,40 @@ seconds([(_,B)|T], [B|Tail]):-seconds(T,Tail).
 ordenaPorDistanciaBF(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdBF(IdHead,Id,Distancia)),List),
                                                 msort(List,Sorted),
                                                 seconds(Sorted,Ans). %so testei com o 1,3,10,11
+                                                
+splitBF([H|T],L1,L2):-ordenaPorDistanciaBF(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
 
-splitPorDistancia([H|T],[H|T1],T2) :- %para esta função funcionar pra todos era fixe receber a lista já ordenada como argumento
-                        ordenaPorDistanciaBF(H,T,Lista),              
-                        length(T,Comp),
+
+%----------------Dividir lista DFS
+
+calcDistIdDF(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), 
+                                  procuraProfundidadeVarios(FA,FB,Caminho),
+                                  custo(Caminho,Distancia). %distancia entre duas encomendas
+
+ordenaPorDistanciaDF(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdDF(IdHead,Id,Distancia)),List),
+                                            msort(List,Sorted),
+                                            seconds(Sorted,Ans). %so testei com o 1,3,10,11
+
+
+splitDF([H|T],L1,L2):-ordenaPorDistanciaDF(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
+
+%----------------Dividir lista AP
+calcDistIdAP(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), 
+                                  aprofundamentoProgress(FA,FB,_,Distancia).
+                                 
+ordenaPorDistanciaAP(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdAP(IdHead,Id,Distancia)),List),
+                                            msort(List,Sorted),
+                                            seconds(Sorted,Ans). %so testei com o 1,3,10,11
+
+
+splitAP([H|T],L1,L2):-ordenaPorDistanciaAP(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
+
+
+%---------------Split Genérica
+
+splitPorDistancia(H,Lista,[H|T1],T2) :- %para esta função funcionar pra todos era fixe receber a lista já ordenada como argumento(Done)
+                        length(Lista,Comp),
                         CompTotal is Comp + 1,
                         LenL is div(CompTotal,2) + mod(CompTotal,2) -1 , %-1 porque a head nao conta para ir buscar a lista
                         LenR is div(CompTotal,2) ,
