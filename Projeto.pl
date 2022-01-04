@@ -352,8 +352,8 @@ ordenaPorDistanciaBF(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Ta
                                                 seconds(Sorted,Ans). %so testei com o 1,3,10,11
 
 
-splitPorDistancia([H|T],[H|T1],T2) :- 
-                        ordenaPorDistanciaBF(H,T,Lista),
+splitPorDistancia([H|T],[H|T1],T2) :- %para esta função funcionar pra todos era fixe receber a lista já ordenada como argumento
+                        ordenaPorDistanciaBF(H,T,Lista),              
                         length(T,Comp),
                         CompTotal is Comp + 1,
                         LenL is div(CompTotal,2) + mod(CompTotal,2) -1 , %-1 porque a head nao conta para ir buscar a lista
