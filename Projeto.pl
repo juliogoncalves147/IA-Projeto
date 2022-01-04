@@ -8,8 +8,6 @@
 :- dynamic concluido/3.
 :- discontiguous estimaB/3.
 :- discontiguous estima/3.
-:- include('Gulosa.pl').
-:- include('Aestrela.pl').
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -65,11 +63,11 @@ encomenda(3, bomJesus,     12,  67, 250,  pendente).
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
 encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
-encomenda(7, bomJesus,     30,   4,  42,   finalizada).
-encomenda(8, merelim,   35,   3,  25,   caminho).
+encomenda(7, bomJesus,     30,   4,  42, finalizada).
+encomenda(8, merelim,   20,   3,  25, caminho).
 encomenda(9, saoVitor, 20, 2, 21, finalizada).
 encomenda(10,saoVicente, 8, 3, 20, pendente).   
-encomenda(11, vilaVerde, 5, 7, 25, pendente).
+encomenda(11, vilaVerde, 3, 7, 25, pendente).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
@@ -153,9 +151,7 @@ estimaC(amares,11,14).
 estimaC(vilaVerde,17.1,20).
 estimaC(centroDeRecolha,0,0).
 
-estimaM(Local,Km,NewTmp) :-
-        estimaC(Local,Km,Tmp),
-        NewTmp is (0.9 * Tmp). 
+estimaM(Local,Km,NewTmp) :- estimaC(Local,Km,Tmp), NewTmp is (0.9 * Tmp). 
 
 estimaB(sameiro,6.4,49).
 estimaB(bomJesus,3.9,28).
@@ -178,13 +174,66 @@ estimaB(centroDeRecolha,0,0).
 connected(X,Y) :- aresta(X,Y,_).
 
 membro(X, [X|_]).
-membro(X, [_|Xs]):-
-	membro(X, Xs).
+membro(X, [_|Xs]):- membro(X, Xs).
 
 move(X,Y,Custo) :- aresta(X,Y,Custo).
 move(X,Y,Custo) :- aresta(Y,X,Custo).
 
 %------------Profundidade DFS-----------------------------
+/*testa(Caminhos) :- multi(Caminhos), printCircuitos(Caminhos).
+
+printCircuitos([]).
+printCircuitos([L|T]) :- writeln(L), printCircuitos(T).
+
+
+multi(Caminhos):-   findall(Freguesia, encomenda(_, Freguesia,_,_,_,pendente), PorPassar),
+                    findall(Caminho, 
+                    (algoritmoDFSAux(_,Caminho),containsAll(PorPassar, Caminho))
+                    ,Caminhos).
+                    
+containsAll([],_).
+containsAll([H|T], L1):- member(H,L1),containsAll(T,L1).
+*/
+
+getPrazo(IdEncomenda, Prazo) :- entrega(IdEntrega,_,IdEncomenda, Prazo,_).
+getFreguesia(IdEncomenda, Freguesia) :- encomenda(IdEncomenda, Freguesia,_,_,_,_).
+
+ordenaPrazo([], []).
+ordenaPrazo([H|T], R):- ordenaPrazo(T, R1), insert_ordPrazo(H, R1, R).
+
+insert_ordPrazo(X, [H|T], [H|R]):- getPrazo(X,A) , getPrazo(H,B), A >B, !, insert_ordPrazo(X, T, R).
+insert_ordPrazo(X, T, [X|T]).
+
+
+getFreguesias([Id], [Freguesia]) :- encomenda(Id,Freguesia,_,_,_,_).
+getFreguesias([Id|T], [Freguesia|Lista]) :- encomenda(Id,Freguesia,_,_,_,_), getFreguesias(T, Lista).
+
+
+
+
+
+listadeRotas(IdsEncomendas, Caminho) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                       getFreguesias(IdsOrdenados, Freguesias),
+                                       append([centroDeRecolha],Freguesias, NewFreguesias),
+                                       append(NewFreguesias, [centroDeRecolha], FreguesiasC),
+                                       calculaRota(FreguesiasC, Caminho).
+
+calculaRota([T], Caminho).
+calculaRota([X,Y], [Caminho]) :- procuraProfundidadeVarios(X,Y, Caminho).
+calculaRota([X,Y|T], [Z|Caminho]) :- procuraProfundidadeVarios(X,Y,Z), calculaRota([Y|T],Caminho).
+
+
+procuraProfundidadeVarios(Origem, Destino, Caminho) :- dfs(Origem,Destino,Caminho).
+
+dfs(Orig,Dest,Cam) :-  dfs2(Orig,Dest,[Orig],Cam).
+dfs2(Dest,Dest,LA,Cam) :- reverse(LA,Cam).
+dfs2(Act,Dest,LA,Cam) :-  move(Act,X,_),
+                          \+ member(X,LA),
+                          dfs2(X,Dest,[X|LA],Cam). 
+
+%---------------------------------------------------------
+%------------Profundidade DFS-----------------------------
+%---------------------------------------------------------
 
 algoritmoDFS(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoDFSAux(IdEncomenda, Circuito)), X).
 
@@ -195,7 +244,6 @@ algoritmoDFSAux(IdEncomenda,Caminho) :- encomenda(IdEncomenda, Freguesia, Peso, 
                              escolheTransporte(Peso, Custo, Prazo, Transporte),
                              calculaTempo(Transporte, Peso, Custo, Tempo),
                              printCircuito(Caminho,Custo,Tempo,Transporte),!.
-
 
 printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
 	write('Caminho = '),writeln(Caminho),
@@ -213,7 +261,6 @@ profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
     move(Nodo,ProxNodo, C1),
     not(member(ProxNodo,Historico)),
     profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
-
 
 %------------Auxiliares-----------------------------
 
@@ -234,15 +281,13 @@ calculaTempo(moto,Peso,Distancia,Tempo) :-
     VelocidadeMedia is (35 - (0.5 * Peso)),
     Tempo is (Distancia / VelocidadeMedia).
 
-seleciona(H,[H|T],T).
-seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT). 
-
 %------------Largura BFS-----------------------------
 %Largura (BFS - Breadth-First Search)
 
+
 algoritmoBFS(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoBFSAux(IdEncomenda, Circuito)), X).
 
-algoritmoBFSAux(IdEncomenda,Caminho) :-    encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
+algoritmoBFSAux(IdEncomenda,Caminho) :- encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
                                         entrega(_, _, IdEncomenda, Prazo, _),
                                         larguraprimeiroBF(Freguesia, Caminho, Custo),
                                         escolheTransporte(Peso, Custo, Prazo, Transporte),

@@ -13,6 +13,14 @@ circuitoGulosa(Nodo,Prazo,Peso,Caminho,carro) :-
     custo(Caminho,Distancia),
     calculaTempo(carro,Peso,Distancia,Tempo),
     Tempo =< Prazo.
+
+
+
+printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
+	write('Caminho = '),writeln(Caminho),
+	write('Distancia = '),write(Distancia),writeln(' km'),
+	write('Tempo de entrega = '),write(TempoEntrega),writeln(' horas'),
+	write('Tipo de transporte = '),writeln(Transporte),writeln('').
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------
 
