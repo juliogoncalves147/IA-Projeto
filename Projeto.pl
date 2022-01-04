@@ -214,7 +214,6 @@ getFreguesias([Id], [Freguesia]) :- encomenda(Id,Freguesia,_,_,_,_).
 getFreguesias([Id|T], [Freguesia|Lista]) :- encomenda(Id,Freguesia,_,_,_,_), getFreguesias(T, Lista).
 
 
-
 listadeRotas(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
                                                     getFreguesias(IdsOrdenados, Freguesias),
                                                     append([centroDeRecolha],Freguesias, NewFreguesias),
