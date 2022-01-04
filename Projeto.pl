@@ -11,8 +11,12 @@
 :- include('Gulosa.pl').
 :- include('Gulosa2.pl').
 :- include('Aestrela.pl').
+<<<<<<< Updated upstream
 :- include('Splits.pl').
 
+=======
+:- include('Aestrela2.pl').
+>>>>>>> Stashed changes
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
