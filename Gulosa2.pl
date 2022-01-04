@@ -1,3 +1,4 @@
+/*
 circuitoGulosa(Nodo,Prazo,Peso,Caminho,bicicleta) :-
     resolve_gulosa(Nodo,bicicleta,Peso,Caminho),
     custo(Caminho,Distancia),
@@ -14,59 +15,62 @@ circuitoGulosa(Nodo,Prazo,Peso,Caminho,carro) :-
     calculaTempo(carro,Peso,Distancia,Tempo),
     Tempo =< Prazo.
 
+
+
+printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
+	write('Caminho = '),writeln(Caminho),
+	write('Distancia = '),write(Distancia),writeln(' km'),
+	write('Tempo de entrega = '),write(TempoEntrega),writeln(' horas'),
+	write('Tipo de transporte = '),writeln(Transporte),writeln('').*/
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------
 
-resolve_gulosa(Nodo, carro, Peso, Caminho) :-
+resolve_gulosa2(NodoI, NodoF, carro, Peso, Caminho) :-
     Peso =< 100,
-    estimaC(Nodo,EstimaKm,EstimaTmp),
-    agulosaCarro([[Nodo]/EstimaKm/EstimaTmp],Caminho/_/_).
-
-resolve_gulosa(Nodo, moto, Peso, Caminho) :-
+    procuraProfundidadeVarios(NodoI, NodoF, CaminhoAux),
+    custo(CaminhoAux,EstimaKm),
+    calculaTempo(carro,Peso,EstimaKm,EstimaTmp),
+    agulosaCarro2([[NodoF]/EstimaKm/EstimaTmp], Caminho/_/_, NodoI, Peso).
+/*
+resolve_gulosa2(NodoI, NodoF, moto, Peso, Caminho) :-
     Peso =< 20,
     estimaM(Nodo,EstimaKm,EstimaTmp),
-    agulosaMoto([[Nodo]/EstimaKm/EstimaTmp],Caminho/_/_).
+    agulosaMoto([[Nodo]/EstimaKm/EstimaTmp],InvCaminhoD/_/_),
+    reverse(InvCaminhoD,Caminho).
 
-resolve_gulosa(Nodo, bicicleta, Peso, Caminho) :-
+resolve_gulosa2(NodoI, NodoF, bicicleta, Peso, Caminho) :-
     Peso =< 5,
     estimaB(Nodo,EstimaKm,EstimaTmp),
-    agulosaBic([[Nodo]/EstimaKm/EstimaTmp],Caminho/_/_).
-
+    agulosaBic([[Nodo]/EstimaKm/EstimaTmp],InvCaminhoD/_/_),
+    reverse(InvCaminhoD,Caminho).
+*/
 
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  CARRO  ------------------------------------------
 
-agulosaCarro(Caminhos,Caminho) :-
+agulosaCarro2(Caminhos,Caminho,NodoI,_) :-
     obtem_melhorCarro(Caminhos,Caminho),
-    Caminho = [Nodo|_]/_/_,
-    final(Nodo).
-agulosaCarro(Caminhos,SolucaoCaminho) :-
+    Caminho = [NodoI|_]/_/_.
+agulosaCarro2(Caminhos,SolucaoCaminho,NodoI,Peso) :-
     obtem_melhorCarro(Caminhos,MelhorCaminho),
     seleciona(MelhorCaminho,Caminhos,OutrosCaminhos),
-    expande_gulosaCarro(MelhorCaminho,ExpCaminhos),
+    expande_gulosaCarro2(MelhorCaminho,ExpCaminhos,NodoI,Peso),
     append(OutrosCaminhos,ExpCaminhos,NovoCaminhos),
-    agulosaCarro(NovoCaminhos,SolucaoCaminho).
+    agulosaCarro2(NovoCaminhos,SolucaoCaminho,NodoI,Peso).
 
-expande_gulosaCarro(Caminho,ExpCaminhos) :-
-    findall(NovoCaminho, (adjacenteCarro(Caminho,NovoCaminho)), ExpCaminhos).
+expande_gulosaCarro2(Caminho,ExpCaminhos,NodoI,Peso) :-
+    findall(NovoCaminho, (adjacenteCarro2(Caminho,NovoCaminho,NodoI,Peso)), ExpCaminhos).
 
-adjacenteCarro([Nodo|Caminho]/_/_,[ProxNodo,Nodo|Caminho]/EstKm/EstTmp) :-
+adjacenteCarro2([Nodo|Caminho]/_/_, [ProxNodo,Nodo|Caminho]/EstKm/EstTmp, NodoI, Peso) :-
     move(Nodo,ProxNodo,_),
     \+member(ProxNodo,Caminho),
-    estimaC(ProxNodo,EstKm,EstTmp).
-
-obtem_melhorCarro([Caminho],Caminho) :- !.
-obtem_melhorCarro([Caminho1/EstKm1/EstTmp1,_/EstKm2/EstTmp2|Caminhos],MelhorCaminho) :-
-    Produtividade1 is 0.3 * EstKm1 + 0.7 * EstTmp1,
-    Produtividade2 is 0.3 * EstKm2 + 0.7 * EstTmp2,
-    Produtividade1 =< Produtividade2 , !,
-    obtem_melhorCarro([Caminho1/EstKm1/EstTmp1|Caminhos],MelhorCaminho).
-obtem_melhorCarro([_|Caminhos],MelhorCaminho) :-
-    obtem_melhorCarro(Caminhos,MelhorCaminho).
+    procuraProfundidadeVarios(NodoI, ProxNodo, CaminhoAux),
+    custo(CaminhoAux,EstKm),
+    calculaTempo(carro,Peso,EstKm,EstTmp).
 
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  MOTO  ------------------------------------------
-
+/*
 agulosaMoto(Caminhos,Caminho) :-
     obtem_melhorMoto(Caminhos,Caminho),
     Caminho = [Nodo|_]/_/_,
@@ -124,13 +128,4 @@ obtem_melhorBic([Caminho1/EstKm1/EstTmp1,_/EstKm2/EstTmp2|Caminhos],MelhorCaminh
 obtem_melhorBic([_|Caminhos],MelhorCaminho) :-
     obtem_melhorBic(Caminhos,MelhorCaminho).
 
-%-----------------------------------------------------------------------------------------------
-%--------------------------------------     GLOBAIS    -----------------------------------------
-
-obtem_melhor_g([Caminho],Caminho) :- !.
-obtem_melhor_g([Caminho1/Custo1/Est1,_/_/Est2|Caminhos],MelhorCaminho) :-
-    Est1 =< Est2, !,
-    obtem_melhor_g([Caminho1/Custo1/Est1|Caminhos],MelhorCaminho).
-obtem_melhor_g([_|Caminhos],MelhorCaminho) :-
-    obtem_melhor_g(Caminhos,MelhorCaminho).
-
+*/

@@ -8,6 +8,10 @@
 :- dynamic concluido/3.
 :- discontiguous estimaB/3.
 :- discontiguous estima/3.
+:- include('Gulosa.pl').
+:- include('Gulosa2.pl').
+:- include('Aestrela.pl').
+
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -249,7 +253,7 @@ calculaRota([X,Y], [Caminho]) :- procuraProfundidadeVarios(X,Y, Caminho).
 calculaRota([X,Y|T], [Z|Caminho]) :- procuraProfundidadeVarios(X,Y,Z), calculaRota([Y|T],Caminho).
 
 
-procuraProfundidadeVarios(Origem, Destino, Caminho) :- dfs(Origem,Destino,Caminho).
+procuraProfundidadeVarios(Origem, Destino, Caminho) :- dfs(Origem,Destino,Caminho),!.
 
 dfs(Orig,Dest,Cam) :-  dfs2(Orig,Dest,[Orig],Cam).
 dfs2(Dest,Dest,LA,Cam) :- reverse(LA,Cam).
@@ -306,6 +310,9 @@ calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
 calculaTempo(moto,Peso,Distancia,Tempo) :-
     VelocidadeMedia is (35 - (0.5 * Peso)),
     Tempo is (Distancia / VelocidadeMedia).
+
+seleciona(H,[H|T],T).
+seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT). 
 
 %------------Largura BFS-----------------------------
 %Largura (BFS - Breadth-First Search)
