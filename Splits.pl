@@ -17,7 +17,7 @@ ordenaPorDistanciaBF(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Ta
                                                 msort(List,Sorted),
                                                 seconds(Sorted,Ans). %so testei com o 1,3,10,11
                                                 
-splitBF([H|T],L1,L2):-ordenaPorDistanciaBF(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
+splitBF([H|T],L1,L2):- ordenaPorDistanciaBF(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
 
 

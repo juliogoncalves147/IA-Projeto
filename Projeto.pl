@@ -70,7 +70,7 @@ encomenda(1, sameiro,    5,   5,  50,   pendente).
 encomenda(2, maximinos,  3,  10, 60,   caminho).
 encomenda(3, bomJesus,  12,  67, 250,  pendente).             
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
-encomenda(5, gualtar,   2,   2,  1500, finalizada).
+encomenda(5, universidade,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
 encomenda(7, bomJesus,  30,   4,  42, finalizada).
 encomenda(8, merelim,   20,   3,  25, caminho).
@@ -90,8 +90,8 @@ entrega( 6, date(2021, 6,6), 5, 7, bicicleta).
 entrega( 7, date(2021, 6,4), 7, 8, carro).
 entrega( 8, date(2021, 9,10), 8, 5, carro).
 entrega( 9, date(2021, 6,1), 9, 20, carro).
-entrega( 10, date(2022, 1, 3), 10, 10, bicicleta).
-entrega( 11, date(2021, 12, 25), 11, 15, bicicleta).
+entrega( 10, date(2022, 1, 3), 10, 1, bicicleta).
+entrega( 11, date(2021, 12, 25), 11, 2, bicicleta).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
@@ -188,73 +188,25 @@ membro(X, [_|Xs]):- membro(X, Xs).
 move(X,Y,Custo) :- aresta(X,Y,Custo).
 move(X,Y,Custo) :- aresta(Y,X,Custo).
 
-%------------Profundidade DFS-----------------------------
-/*testa(Caminhos) :- multi(Caminhos), printCircuitos(Caminhos).
-
-printCircuitos([]).
-printCircuitos([L|T]) :- writeln(L), printCircuitos(T).
-
-
-multi(Caminhos):-   findall(Freguesia, encomenda(_, Freguesia,_,_,_,pendente), PorPassar),
-                    findall(Caminho, 
-                    (algoritmoDFSAux(_,Caminho),containsAll(PorPassar, Caminho))
-                    ,Caminhos).
-                    
-containsAll([],_).
-containsAll([H|T], L1):- member(H,L1),containsAll(T,L1).
-*/
-
-getPrazo(IdEncomenda, Prazo) :- entrega(_,_,IdEncomenda, Prazo,_).
-getFreguesia(IdEncomenda, Freguesia) :- encomenda(IdEncomenda, Freguesia,_,_,_,_).
-
-ordenaPrazo([], []).
-ordenaPrazo([H|T], R):- ordenaPrazo(T, R1), insert_ordPrazo(H, R1, R).
-
-insert_ordPrazo(X, [H|T], [H|R]):- getPrazo(X,A) , getPrazo(H,B), A >B, !, insert_ordPrazo(X, T, R).
-insert_ordPrazo(X, T, [X|T]).
+%-----------------------------------------------------------------------------
+%------------Profundidade DFS (Várias Encomendas)-----------------------------
+%-----------------------------------------------------------------------------
+multiDFS(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiDFSAux(Lista, Caminho, Transporte).
 
 
-getFreguesias([Id], [Freguesia]) :- encomenda(Id,Freguesia,_,_,_,_).
-getFreguesias([Id|T], [Freguesia|Lista]) :- encomenda(Id,Freguesia,_,_,_,_), getFreguesias(T, Lista).
+multiDFSAux(Lista,Caminho,Transporte) :- listadeRotasDFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiDFSAux(Lista,Caminho,Transporte) :- splitDF(Lista,X,Y), multiDFSAux(X,_,_), multiDFSAux(Y,_,_).
 
 
-listadeRotas(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
-                                                    getFreguesias(IdsOrdenados, Freguesias),
-                                                    append([centroDeRecolha],Freguesias, NewFreguesias),
-                                                    calculaRota(NewFreguesias, Caminho),
-                                                    verificaValido(IdsOrdenados, Caminho, 0, Transporte).
-                
+listadeRotasDFS(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                       getFreguesias(IdsOrdenados, Freguesias),
+                                                       append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                       calculaRotaDFS(NewFreguesias, Caminho),
+                                                       verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+                                                                    
 
-verificaValido([X],[Y],Tempo, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, TempoFinal).
-verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, bicicleta) :- verificaCaminho(IdsEncomenda, Caminho, bicicleta, Tempo, TempoFinal),
-                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal, bicicleta).
-verificaValido([X],[Y],Tempo, moto) :- verificaCaminho(X,Y, moto, Tempo, _).
-verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, moto) :- verificaCaminho(IdsEncomenda, Caminho, moto, Tempo, TempoFinal),
-                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal,moto).
-verificaValido([X],[Y],Tempo, carro) :- verificaCaminho(X,Y, carro, Tempo, _).
-verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, carro) :- verificaCaminho(IdsEncomenda, Caminho, carro, Tempo, TempoFinal),
-                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal, carro).
-                                                                                                                               
-
-verificaCaminho(IdEncomenda, Caminho, bicicleta, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 5,
-                                                                       getPrazo(IdEncomenda,Prazo),
-                                                                       calculaTempo(_,Peso, Custo, TempoRota),
-                                                                       Prazo >= TempoRota + Tempo,
-                                                                       TempoFinal is (TempoRota + Tempo).
-verificaCaminho(IdEncomenda, Caminho, moto, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 20,
-                                                                        getPrazo(IdEncomenda,Prazo),
-                                                                        calculaTempo(_,Peso, Custo, TempoRota),
-                                                                        Prazo >= TempoRota + Tempo,
-                                                                        TempoFinal is (TempoRota + Tempo).
-verificaCaminho(IdEncomenda, Caminho, carro, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 100,
-                                                                        getPrazo(IdEncomenda,Prazo),
-                                                                        calculaTempo(_,Peso, Custo, TempoRota),
-                                                                        Prazo >= TempoRota + Tempo,
-                                                                        TempoFinal is (TempoRota + Tempo).                                                                        
-
-calculaRota([X,Y], [Caminho]) :- procuraProfundidadeVarios(X,Y, Caminho).
-calculaRota([X,Y|T], [Z|Caminho]) :- procuraProfundidadeVarios(X,Y,Z), calculaRota([Y|T],Caminho).
-
+calculaRotaDFS([X,Y], [Caminho]) :- procuraProfundidadeVarios(X,Y, Caminho).
+calculaRotaDFS([X,Y|T], [Z|Caminho]) :- procuraProfundidadeVarios(X,Y,Z), calculaRotaDFS([Y|T],Caminho).
 
 procuraProfundidadeVarios(Origem, Destino, Caminho) :- dfs(Origem,Destino,Caminho),!.
 
@@ -263,6 +215,41 @@ dfs2(Dest,Dest,LA,Cam) :- reverse(LA,Cam).
 dfs2(Act,Dest,LA,Cam) :-  move(Act,X,_),
                           \+ member(X,LA),
                           dfs2(X,Dest,[X|LA],Cam). 
+                          
+%-----------------------------------------------------------------------------
+%-----------------Largura BFS (Várias Encomendas)-----------------------------
+%-----------------------------------------------------------------------------
+multiBFS(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiBFSAux(Lista, Caminho, Transporte).
+
+multiBFSAux(Lista,Caminho,Transporte) :- listadeRotasBFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiBFSAux(Lista,_,_) :- splitBF(Lista,X,Y), multiBFSAux(X,_,_), multiBFSAux(Y,_,_).
+
+
+listadeRotasBFS(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                       getFreguesias(IdsOrdenados, Freguesias),
+                                                       append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                       calculaRotaBFS(NewFreguesias, Caminho),
+                                                       verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+
+calculaRotaBFS([X,Y], [Caminho]) :- larguraprimeiroBF(X,Y,Caminho,_).
+calculaRotaBFS([X,Y|T], [Z|Caminho]) :- larguraprimeiroBF(X,Y,Z,_), calculaRotaBFS([Y|T],Caminho).
+
+%-----------------------------------------------------------------------------
+%--------- Profundidade com Limite (Várias Encomendas)------------------------
+%-----------------------------------------------------------------------------
+multiAP(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiAPAux(Lista, Caminho, Transporte).
+
+multiAPAux(Lista,Caminho,Transporte) :- listadeRotasAP(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiAPAux(Lista,_,_) :- splitAP(Lista,X,Y), multiAPAux(X,_,_), multiAPAux(Y,_,_).
+
+listadeRotasAP(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                      getFreguesias(IdsOrdenados, Freguesias),
+                                                      append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                      calculaRotaAP(NewFreguesias, Caminho),
+                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+
+calculaRotaAP([X,Y], [Caminho]) :- aprofundamentoProgress(X,Y,Caminho,_).
+calculaRotaAP([X,Y|T], [Z|Caminho]) :- aprofundamentoProgress(X,Y,Z,_), calculaRotaAP([Y|T],Caminho).
 
 %---------------------------------------------------------
 %------------Profundidade DFS-----------------------------
@@ -278,16 +265,10 @@ algoritmoDFSAux(IdEncomenda,Caminho) :- encomenda(IdEncomenda, Freguesia, Peso, 
                              calculaTempo(Transporte, Peso, Custo, Tempo),
                              printCircuito(Caminho,Custo,Tempo,Transporte),!.
 
-printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
-	write('Caminho = '),writeln(Caminho),
-	write('Distancia = '),write(Distancia),writeln(' km'),
-	write('Tempo de entrega = '),write(TempoEntrega),writeln(' horas'),
-	write('Tipo de transporte = '),writeln(Transporte),writeln('').
 
 procuraProfundidade(Destino, Caminho, Custo) :- resolve_pp_c(Destino,C,Custo),reverse(C, Caminho).
 
-resolve_pp_c(Nodo, [Nodo|Caminho], C) :-
-    profundidadeprimeiro(Nodo,[Nodo], Caminho , C).
+resolve_pp_c(Nodo, [Nodo|Caminho], C) :- profundidadeprimeiro(Nodo,[Nodo], Caminho , C).
 
 profundidadeprimeiro(Nodo,_,[],0) :- final(Nodo).
 profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
@@ -295,31 +276,11 @@ profundidadeprimeiro(Nodo, Historico, [ProxNodo|Caminho], C):-
     not(member(ProxNodo,Historico)),
     profundidadeprimeiro(ProxNodo,[ProxNodo|Historico],Caminho, C2), C is C1+C2.
 
-%------------Auxiliares-----------------------------
 
-escolheTransporte(Peso, Custo, Prazo, bicicleta) :- Peso =< 5, calculaTempo(bicicleta, Peso, Custo, Tempo) , Tempo =< Prazo.
-escolheTransporte(Peso, Custo, Prazo, moto) :- Peso =< 20, calculaTempo(moto, Peso, Custo, Tempo) , Tempo =< Prazo.
-escolheTransporte(Peso, Custo, Prazo, carro) :- Peso =< 100, calculaTempo(carro, Peso, Custo, Tempo) , Tempo =< Prazo.
-        
-
-calculaTempo(carro,Peso,Distancia,Tempo) :-
-    VelocidadeMedia is (25 - (0.1 * Peso)),
-    Tempo is (Distancia / VelocidadeMedia).
-
-calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
-    VelocidadeMedia is (10 - (0.7 * Peso)),
-    Tempo is (Distancia / VelocidadeMedia).
-
-calculaTempo(moto,Peso,Distancia,Tempo) :-
-    VelocidadeMedia is (35 - (0.5 * Peso)),
-    Tempo is (Distancia / VelocidadeMedia).
-
-seleciona(H,[H|T],T).
-seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT). 
-
-%------------Largura BFS-----------------------------
+%---------------------------------------------------------
+%------------Largura BFS----------------------------------
+%---------------------------------------------------------
 %Largura (BFS - Breadth-First Search)
-
 
 algoritmoBFS(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoBFSAux(IdEncomenda, Circuito)), X).
 
@@ -341,13 +302,10 @@ larguraprimeiro(Dest, [Largura|Outros], Caminho) :-
     append(Outros, Novos, Todos),
     larguraprimeiro(Dest, Todos, Caminho).
 
-
-custo([A,B],Custo) :- move(A,B,Custo).
-custo([A,B|T],Custo) :- move(A,B,C),
-        custo([B|T],NewCusto),
-        Custo is NewCusto+C.
-
-%------------Algoritmo Pesquisa Iterativa Aprofundamento Progressivo----------------------------
+%-----------------------------------------------------------------
+%-----------------------------------------------------------------
+%-----Algoritmo Pesquisa Iterativa Aprofundamento Progressivo-----
+%-----------------------------------------------------------------
 algoritmoAP(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoAPAux(IdEncomenda, Circuito)), X).
 
 
@@ -369,6 +327,94 @@ limitadaAux(Origem,Destino,Caminho,Iter,Custo):- limite(Y), Iter<Y ,X is Iter+1 
 
 limitadaProfundidade(Origem,Destino,Caminho,Limite,Custo):-
         procuraProfundidadeVarios(Origem,Destino,Caminho),custo(Caminho,Custo), Custo > 0 , Custo=<Limite.
+
+%------------Auxiliares-----------------------------
+
+verificaCaminho(IdEncomenda, Caminho, bicicleta, Tempo, TempoFinal, Peso, PesoFinal) :- custo(Caminho, Custo), 
+                                                                                        getPeso(IdEncomenda,PesoEncomenda), 
+                                                                                        PesoEncomenda + Peso =< 5,
+                                                                                        PesoFinal is (PesoEncomenda + Peso),    
+                                                                                        getPrazo(IdEncomenda,Prazo),
+                                                                                        calculaTempo(_,Peso, Custo, TempoRota),
+                                                                                        Prazo >= TempoRota + Tempo,
+                                                                                        TempoFinal is (TempoRota + Tempo).
+
+verificaCaminho(IdEncomenda, Caminho, moto, Tempo, TempoFinal, Peso, PesoFinal) :- custo(Caminho, Custo), 
+                                                                                   getPeso(IdEncomenda,PesoEncomenda), 
+                                                                                   PesoEncomenda + Peso =< 20,
+                                                                                   PesoFinal is (PesoEncomenda + Peso),
+                                                                                   getPrazo(IdEncomenda,Prazo),
+                                                                                   calculaTempo(_,Peso, Custo, TempoRota),
+                                                                                   Prazo >= TempoRota + Tempo,
+                                                                                   TempoFinal is (TempoRota + Tempo).
+
+verificaCaminho(IdEncomenda, Caminho, carro, Tempo, TempoFinal, Peso, PesoFinal) :- custo(Caminho, Custo), 
+                                                                                     getPeso(IdEncomenda,PesoEncomenda), 
+                                                                                     PesoEncomenda + Peso =< 100,
+                                                                                     PesoFinal is (PesoEncomenda + Peso),
+                                                                                     getPrazo(IdEncomenda,Prazo),
+                                                                                     calculaTempo(_,Peso, Custo, TempoRota),
+                                                                                     Prazo >= TempoRota + Tempo,
+                                                                                     TempoFinal is (TempoRota + Tempo). 
+
+
+verificaValido([X],[Y],Tempo, Peso, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, _, Peso, _).
+verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, Peso, bicicleta) :- verificaCaminho(IdsEncomenda, Caminho, bicicleta, Tempo, TempoFinal, Peso, PesoFinal),
+                                                                                        verificaValido(Encomendas, Caminhos, TempoFinal, PesoFinal, bicicleta).
+
+verificaValido([X],[Y],Tempo, Peso, moto) :- verificaCaminho(X,Y, moto, Tempo, _, Peso, _).
+verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo,Peso, moto) :- verificaCaminho(IdsEncomenda, Caminho, moto, Tempo, TempoFinal, Peso, PesoFinal),
+                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal, PesoFinal, moto).
+
+verificaValido([X],[Y],Tempo, Peso, carro) :- verificaCaminho(X,Y, carro, Tempo, _, Peso, _).
+verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, Peso, carro) :- verificaCaminho(IdsEncomenda, Caminho, carro, Tempo, TempoFinal, Peso, PesoFinal),
+                                                                                    verificaValido(Encomendas, Caminhos, TempoFinal, PesoFinal, carro).                         
+
+
+getPrazo(IdEncomenda, Prazo) :- entrega(_,_,IdEncomenda, Prazo,_).
+getFreguesia(IdEncomenda, Freguesia) :- encomenda(IdEncomenda, Freguesia,_,_,_,_).
+
+ordenaPrazo([], []).
+ordenaPrazo([H|T], R):- ordenaPrazo(T, R1), insert_ordPrazo(H, R1, R).
+
+insert_ordPrazo(X, [H|T], [H|R]):- getPrazo(X,A) , getPrazo(H,B), A >B, !, insert_ordPrazo(X, T, R).
+insert_ordPrazo(X, T, [X|T]).
+
+
+getFreguesias([Id], [Freguesia]) :- encomenda(Id,Freguesia,_,_,_,_).
+getFreguesias([Id|T], [Freguesia|Lista]) :- encomenda(Id,Freguesia,_,_,_,_), getFreguesias(T, Lista).
+
+printCircuito(Caminho,Distancia,TempoEntrega,Transporte) :-
+	write('Caminho = '),writeln(Caminho),
+	write('Distancia = '),write(Distancia),writeln(' km'),
+	write('Tempo de entrega = '),write(TempoEntrega),writeln(' horas'),
+	write('Tipo de transporte = '),writeln(Transporte),writeln('').
+
+
+escolheTransporte(Peso, Custo, Prazo, bicicleta) :- Peso =< 5, calculaTempo(bicicleta, Peso, Custo, Tempo) , Tempo =< Prazo.
+escolheTransporte(Peso, Custo, Prazo, moto) :- Peso =< 20, calculaTempo(moto, Peso, Custo, Tempo) , Tempo =< Prazo.
+escolheTransporte(Peso, Custo, Prazo, carro) :- Peso =< 100, calculaTempo(carro, Peso, Custo, Tempo) , Tempo =< Prazo.
+
+custo([A,B],Custo) :- move(A,B,Custo).
+custo([A,B|T],Custo) :- move(A,B,C),
+        custo([B|T],NewCusto),
+        Custo is NewCusto+C.  
+
+calculaTempo(carro,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (25 - (0.1 * Peso)),
+    Tempo is (Distancia / VelocidadeMedia).
+
+calculaTempo(bicicleta,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (10 - (0.7 * Peso)),
+    Tempo is (Distancia / VelocidadeMedia).
+
+calculaTempo(moto,Peso,Distancia,Tempo) :-
+    VelocidadeMedia is (35 - (0.5 * Peso)),
+    Tempo is (Distancia / VelocidadeMedia).
+
+seleciona(H,[H|T],T).
+seleciona(H,[X|T],[X|NewT]) :- seleciona(H,T,NewT). 
+
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
