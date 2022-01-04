@@ -44,6 +44,17 @@ ordenaPorDistanciaAP(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Ta
 
 splitAP([H|T],L1,L2):-ordenaPorDistanciaAP(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
+%---------------Dividir lista Gulosa
+
+calcDistIdG(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), 
+                                  aprofundamentoProgress(FA,FB,_,Distancia).
+                                 
+ordenaPorDistanciaAP(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdAP(IdHead,Id,Distancia)),List),
+                                            msort(List,Sorted),
+                                            seconds(Sorted,Ans). %so testei com o 1,3,10,11
+
+
+splitAP([H|T],L1,L2):-ordenaPorDistanciaAP(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
 %---------------Split Genérica
 
@@ -54,5 +65,7 @@ splitPorDistancia(H,Lista,[H|T1],T2) :- %para esta função funcionar pra todos 
                         LenR is div(CompTotal,2) ,
                         buscarPrimeirosXelementos(LenL,Lista,T1),
                         buscarUltimosXelementos(LenR,Lista,T2).
+
+
 
 
