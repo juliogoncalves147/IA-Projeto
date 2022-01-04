@@ -57,15 +57,15 @@ concluido(9, 9, date(2021,6,9)).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Encomenda
 % Extensao do predicado encomenda : IdEncomenda, Freguesia, Peso, Volume, Preço, Estado -> { V, F }
-encomenda(1, sameiro,     5,   5,  50,   pendente).
-encomenda(2, maximinos, 3,  10, 60,   caminho).
-encomenda(3, bomJesus,     12,  67, 250,  pendente).             
+encomenda(1, sameiro,    5,   5,  50,   pendente).
+encomenda(2, maximinos,  3,  10, 60,   caminho).
+encomenda(3, bomJesus,  12,  67, 250,  pendente).             
 encomenda(4, lamacaes,  10,  18, 27,   finalizada).
 encomenda(5, gualtar,   2,   2,  1500, finalizada).
 encomenda(6, lomar,     70, 4,  30,   caminho).
-encomenda(7, bomJesus,     30,   4,  42, finalizada).
+encomenda(7, bomJesus,  30,   4,  42, finalizada).
 encomenda(8, merelim,   20,   3,  25, caminho).
-encomenda(9, saoVitor, 20, 2, 21, finalizada).
+encomenda(9, saoVitor,  20, 2, 21, finalizada).
 encomenda(10,saoVicente, 8, 3, 20, pendente).   
 encomenda(11, vilaVerde, 3, 7, 25, pendente).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
@@ -210,15 +210,41 @@ getFreguesias([Id|T], [Freguesia|Lista]) :- encomenda(Id,Freguesia,_,_,_,_), get
 
 
 
+listadeRotas(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                    getFreguesias(IdsOrdenados, Freguesias),
+                                                    append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                    calculaRota(NewFreguesias, Caminho),
+                                                    verificaValido(IdsOrdenados, Caminho, 0, Transporte).
+                
 
 
-listadeRotas(IdsEncomendas, Caminho) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
-                                       getFreguesias(IdsOrdenados, Freguesias),
-                                       append([centroDeRecolha],Freguesias, NewFreguesias),
-                                       append(NewFreguesias, [centroDeRecolha], FreguesiasC),
-                                       calculaRota(FreguesiasC, Caminho).
+verificaValido([X],[Y],Tempo, bicicleta) :- verificaCaminho(X,Y, bicicleta, Tempo, TempoFinal).
+verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, bicicleta) :- verificaCaminho(IdsEncomenda, Caminho, bicicleta, Tempo, TempoFinal),
+                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal, bicicleta).
+verificaValido([X],[Y],Tempo, moto) :- verificaCaminho(X,Y, moto, Tempo, TempoFinal).
+verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, moto) :- verificaCaminho(IdsEncomenda, Caminho, moto, Tempo, TempoFinal),
+                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal,moto).
+verificaValido([X],[Y],Tempo, carro) :- verificaCaminho(X,Y, carro, Tempo, TempoFinal).
+verificaValido([IdsEncomenda|Encomendas],[Caminho|Caminhos], Tempo, carro) :- verificaCaminho(IdsEncomenda, Caminho, carro, Tempo, TempoFinal),
+                                                                                  verificaValido(Encomendas, Caminhos, TempoFinal, carro).
+                                                                                                                               
 
-calculaRota([T], Caminho).
+verificaCaminho(IdEncomenda, Caminho, bicicleta, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 5,
+                                                                       getPrazo(IdEncomenda,Prazo),
+                                                                       calculaTempo(Transporte,Peso, Custo, TempoRota),
+                                                                       Prazo >= TempoRota + Tempo,
+                                                                       TempoFinal is (TempoRota + Tempo).
+verificaCaminho(IdEncomenda, Caminho, moto, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 20,
+                                                                        getPrazo(IdEncomenda,Prazo),
+                                                                        calculaTempo(Transporte,Peso, Custo, TempoRota),
+                                                                        Prazo >= TempoRota + Tempo,
+                                                                        TempoFinal is (TempoRota + Tempo).
+verificaCaminho(IdEncomenda, Caminho, carro, Tempo, TempoFinal) :- custo(Caminho, Custo), getPeso(IdEncomenda,Peso), Peso =< 100,
+                                                                        getPrazo(IdEncomenda,Prazo),
+                                                                        calculaTempo(Transporte,Peso, Custo, TempoRota),
+                                                                        Prazo >= TempoRota + Tempo,
+                                                                        TempoFinal is (TempoRota + Tempo).                                                                        
+
 calculaRota([X,Y], [Caminho]) :- procuraProfundidadeVarios(X,Y, Caminho).
 calculaRota([X,Y|T], [Z|Caminho]) :- procuraProfundidadeVarios(X,Y,Z), calculaRota([Y|T],Caminho).
 
@@ -360,6 +386,22 @@ splitPorDistancia([H|T],[H|T1],T2) :- %para esta função funcionar pra todos er
                         LenR is div(CompTotal,2) ,
                         buscarPrimeirosXelementos(LenL,Lista,T1),
                         buscarUltimosXelementos(LenR,Lista,T2).
+
+
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%                               1 Fase Trabalho 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- QUERY 1 - - - - - -  -  -  -  -   -
