@@ -13,6 +13,17 @@ circuitoAestrela(Nodo,Prazo,Peso,Caminho,carro) :-
     custo(Caminho,Distancia),
     calculaTempo(carro,Peso,Distancia,Tempo),
     Tempo =< Prazo.
+
+
+algoritmoAStar(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoAStarAux(IdEncomenda, Circuito)), X).
+
+
+algoritmoAStarAux(IdEncomenda,Caminho) :-  encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
+                                        entrega(_, _, IdEncomenda, Prazo, _),
+                                        circuitoAestrela(Freguesia,Prazo, Peso,Caminho,Transporte),
+                                        custo(Caminho,Custo),
+                                        calculaTempo(Transporte, Peso, Custo, Tempo),
+                                        printCircuito(Caminho,Custo,Tempo,Transporte),!.
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------
 

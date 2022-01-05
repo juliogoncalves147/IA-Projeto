@@ -369,7 +369,7 @@ algoritmoAPAux(IdEncomenda,Caminho) :-  encomenda(IdEncomenda, Freguesia, Peso, 
                                         printCircuito(Caminho,Custo,Tempo,Transporte),!.
 
 
-limite(50). %custo máximo do caminho em profundidade 
+limite(100). %custo máximo do caminho em profundidade 
 
 aprofundamentoProgress(Origem,Destino,Caminho,Custo):- limitadaAux(Origem,Destino,Caminho,0,Custo). 
 

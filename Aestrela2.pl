@@ -19,6 +19,7 @@ resolve_aestrela2(NodoI,NodoF,bicicleta,Peso,Caminho) :-
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  CARRO  ------------------------------------------
 
+
 aestrelaCarro2(Caminhos, Caminho,NodoI,_) :-
 	obtem_melhor_aeCarro(Caminhos, Caminho),
 	Caminho = [NodoI|_]/_/_/_/_.
@@ -42,6 +43,7 @@ adjacente_aeCarro2([Nodo|Caminho]/CustoKm/CustoTmp/_/_,[ProxNodo,Nodo|Caminho]/N
 
 %------------------------------------------------------------------------------------------------
 %---------------------------------------------  MOTO  ------------------------------------------
+
 
 aestrelaMoto2(Caminhos, Caminho,NodoI,_) :-
 	obtem_melhor_aeMoto(Caminhos, Caminho),

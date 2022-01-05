@@ -17,6 +17,16 @@ circuitoGulosa(Nodo,Prazo,Peso,Caminho,carro) :-
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------
 
+algoritmoGreedy(X) :- solucoes((IdEncomenda, Circuito), (encomenda(IdEncomenda,_,_,_,_,pendente), algoritmoGreedyAux(IdEncomenda, Circuito)), X).
+
+
+algoritmoGreedyAux(IdEncomenda,Caminho) :-  encomenda(IdEncomenda, Freguesia, Peso, _, _, pendente),
+                                        entrega(_, _, IdEncomenda, Prazo, _),
+                                        circuitoGulosa(Freguesia,Prazo, Peso,Caminho,Transporte),
+                                        custo(Caminho,Custo),
+                                        calculaTempo(Transporte, Peso, Custo, Tempo),
+                                        printCircuito(Caminho,Custo,Tempo,Transporte),!.
+
 resolve_gulosa(Nodo, carro, Peso, Caminho) :-
     Peso =< 100,
     estimaC(Nodo,EstimaKm,EstimaTmp),
