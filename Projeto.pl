@@ -247,6 +247,24 @@ listadeRotasAP(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas,
 calculaRotaAP([X,Y], [Caminho]) :- aprofundamentoProgress(X,Y,Caminho,_).
 calculaRotaAP([X,Y|T], [Z|Caminho]) :- aprofundamentoProgress(X,Y,Z,_), calculaRotaAP([Y|T],Caminho).
 
+%------------------GREEDY(Várias encomendas)-----------
+
+multiGreedy(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiGreedyAux(Lista, Caminho, Transporte).
+
+multiGreedyAux(Lista,Caminho,Transporte) :- listadeRotasGreedy(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiGreedyAux(Lista,_,_) :- splitGreedy(Lista,X,Y), multiGreedyAux(X,_,_), multiGreedyAux(Y,_,_).
+
+listadeRotasGreedy(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                      getFreguesias(IdsOrdenados, Freguesias),
+                                                      append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                      calculaRotaGreedy(NewFreguesias, Caminho),
+                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+
+calculaRotaGreedy([X,Y], [Caminho]) :- resolve_gulosa2(X,Y,moto,5,Caminho).
+calculaRotaGreedy([X,Y|T], [Z|Caminho]) :- resolve_gulosa2(X,Y,moto,5,Z), calculaRotaGreedy([Y|T],Caminho).
+
+
+
 %---------------------------------------------------------
 %------------Profundidade DFS-----------------------------
 %---------------------------------------------------------

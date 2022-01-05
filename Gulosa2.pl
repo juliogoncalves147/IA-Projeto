@@ -24,7 +24,7 @@ resolve_gulosa2(NodoI, NodoF, carro, Peso, Caminho) :-
 resolve_gulosa2(NodoI, NodoF, moto, Peso, Caminho) :-
     Peso =< 20,
     exactHeuristicMoto(NodoI,NodoF,Peso,EstimaKm,EstimaTmp),
-    agulosaMoto2([[NodoF]/EstimaKm/EstimaTmp], Caminho/_/_, NodoI, Peso).
+    agulosaMoto2([[NodoF]/EstimaKm/EstimaTmp], Caminho/_/_, NodoI, Peso),!.
 
 resolve_gulosa2(NodoI, NodoF, bicicleta, Peso, Caminho) :-
     Peso =< 5,

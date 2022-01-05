@@ -44,17 +44,18 @@ ordenaPorDistanciaAP(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Ta
 
 splitAP([H|T],L1,L2):-ordenaPorDistanciaAP(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
-%---------------Dividir lista Gulosa
+%---------------Dividir lista Gulosa carro
 
-calcDistIdG(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), 
-                                  aprofundamentoProgress(FA,FB,_,Distancia).
+calcDistIdGreedy(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), 
+                                      resolve_gulosa2(FA,FB,moto,5,Caminho),writeln(Caminho), %not perfect, so pra ver a distancia
+                                      custo(Caminho,Distancia). 
                                  
-ordenaPorDistanciaAP(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdAP(IdHead,Id,Distancia)),List),
+ordenaPorDistanciaGreedy(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdGreedy(IdHead,Id,Distancia)),List),
                                             msort(List,Sorted),
                                             seconds(Sorted,Ans). %so testei com o 1,3,10,11
 
 
-splitAP([H|T],L1,L2):-ordenaPorDistanciaAP(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
+splitGreedy([H|T],L1,L2):-ordenaPorDistanciaGreedy(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
 %---------------Split Genérica
 
