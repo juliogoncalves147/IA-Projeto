@@ -71,8 +71,8 @@ encomenda(6, lomar,     70, 4,  30,   caminho).
 encomenda(7, bomJesus,  30,   4,  42, finalizada).
 encomenda(8, merelim,   20,   3,  25, caminho).
 encomenda(9, saoVitor,  20, 2, 21, finalizada).
-encomenda(10,saoVicente, 8, 3, 20, pendente).   
-encomenda(11, vilaVerde, 3, 7, 25, pendente).
+encomenda(10,saoVicente, 11, 3, 20, pendente).   
+encomenda(11, vilaVerde, 10, 7, 25, pendente).
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Entrega       
@@ -220,7 +220,6 @@ multiBFS(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,
 multiBFSAux(Lista,Caminho,Transporte) :- listadeRotasBFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
 multiBFSAux(Lista,_,_) :- splitBF(Lista,X,Y), multiBFSAux(X,_,_), multiBFSAux(Y,_,_).
 
-
 listadeRotasBFS(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
                                                        getFreguesias(IdsOrdenados, Freguesias),
                                                        append([centroDeRecolha],Freguesias, NewFreguesias),
@@ -254,14 +253,27 @@ multiGreedy(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_
 multiGreedyAux(Lista,Caminho,Transporte) :- listadeRotasGreedy(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
 multiGreedyAux(Lista,_,_) :- splitGreedy(Lista,X,Y), multiGreedyAux(X,_,_), multiGreedyAux(Y,_,_).
 
-listadeRotasGreedy(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
-                                                      getFreguesias(IdsOrdenados, Freguesias),
-                                                      append([centroDeRecolha],Freguesias, NewFreguesias),
-                                                      calculaRotaGreedy(NewFreguesias, Caminho),
-                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+listadeRotasGreedy(IdsEncomendas, Caminho, bicicleta) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                          getFreguesias(IdsOrdenados, Freguesias),
+                                                          append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                          calculaRotaGreedy(NewFreguesias, Caminho, bicicleta),
+                                                          verificaValido(IdsOrdenados, Caminho, 0, 0, bicicleta).
 
-calculaRotaGreedy([X,Y], [Caminho]) :- resolve_gulosa2(X,Y,moto,5,Caminho).
-calculaRotaGreedy([X,Y|T], [Z|Caminho]) :- resolve_gulosa2(X,Y,moto,5,Z), calculaRotaGreedy([Y|T],Caminho).
+listadeRotasGreedy(IdsEncomendas, Caminho, moto) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                          getFreguesias(IdsOrdenados, Freguesias),
+                                                          append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                          calculaRotaGreedy(NewFreguesias, Caminho, moto),
+                                                          verificaValido(IdsOrdenados, Caminho, 0, 0, moto).
+                                                        
+listadeRotasGreedy(IdsEncomendas, Caminho, carro) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                          getFreguesias(IdsOrdenados, Freguesias),
+                                                          append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                          calculaRotaGreedy(NewFreguesias, Caminho, carro),
+                                                          verificaValido(IdsOrdenados, Caminho, 0, 0, carro).                                                
+
+
+calculaRotaGreedy([X,Y], [Caminho], Transporte) :- resolve_gulosa2(X,Y,Transporte,5,Caminho).
+calculaRotaGreedy([X,Y|T], [Z|Caminho], Transporte) :- resolve_gulosa2(X,Y,Transporte,5,Z), calculaRotaGreedy([Y|T],Caminho, Transporte).
 
 %------------------AESTRELA(Várias encomendas)-----------
 
@@ -270,15 +282,26 @@ multiAStar(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,
 multiAStarAux(Lista,Caminho,Transporte) :- listadeRotasAStar(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
 multiAStarAux(Lista,_,_) :- splitAStar(Lista,X,Y), multiAStarAux(X,_,_), multiAStarAux(Y,_,_).
 
-listadeRotasAStar(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+listadeRotasAStar(IdsEncomendas, Caminho, bicicleta) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
                                                       getFreguesias(IdsOrdenados, Freguesias),
                                                       append([centroDeRecolha],Freguesias, NewFreguesias),
-                                                      calculaRotaAStar(NewFreguesias, Caminho),
-                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+                                                      calculaRotaAStar(NewFreguesias, Caminho, bicicleta),
+                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, bicicleta).
+                                                
+listadeRotasAStar(IdsEncomendas, Caminho, moto) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                      getFreguesias(IdsOrdenados, Freguesias),
+                                                      append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                      calculaRotaAStar(NewFreguesias, Caminho, moto),
+                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, moto).
 
-calculaRotaAStar([X,Y], [Caminho]) :- resolve_aestrela2(X,Y,moto,5,Caminho).
-calculaRotaAStar([X,Y|T], [Z|Caminho]) :- resolve_aestrela2(X,Y,moto,5,Z), calculaRotaGreedy([Y|T],Caminho).
+listadeRotasAStar(IdsEncomendas, Caminho, carro) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                      getFreguesias(IdsOrdenados, Freguesias),
+                                                      append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                      calculaRotaAStar(NewFreguesias, Caminho, carro),
+                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, carro).                                              
 
+calculaRotaAStar([X,Y], [Caminho], Transporte) :- resolve_aestrela2(X,Y,Transporte,5,Caminho).
+calculaRotaAStar([X,Y|T], [Z|Caminho], Transporte) :- resolve_aestrela2(X,Y,Transporte,5,Z), calculaRotaGreedy([Y|T],Caminho, Transporte).
 
 %---------------------------------------------------------
 %------------Profundidade DFS-----------------------------
