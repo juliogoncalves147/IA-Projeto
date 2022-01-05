@@ -190,7 +190,10 @@ move(X,Y,Custo) :- aresta(Y,X,Custo).
 multiDFS(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiDFSAux(Lista, Caminho, Transporte).
 
 
-multiDFSAux(Lista,Caminho,Transporte) :- listadeRotasDFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiDFSAux(Lista,Caminho,Transporte) :- listadeRotasDFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),
+                                                writeln(Transporte),
+                                                custoCaminhos(Caminho,Custo),write('Custo = '),writeln(Custo)
+                                                ,writeln(''),writeln('').
 multiDFSAux(Lista,_,_) :- splitDF(Lista,X,Y), multiDFSAux(X,_,_), multiDFSAux(Y,_,_).
 
 
@@ -217,7 +220,10 @@ dfs2(Act,Dest,LA,Cam) :-  move(Act,X,_),
 %-----------------------------------------------------------------------------
 multiBFS(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiBFSAux(Lista, Caminho, Transporte).
 
-multiBFSAux(Lista,Caminho,Transporte) :- listadeRotasBFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiBFSAux(Lista,Caminho,Transporte) :- listadeRotasBFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho),
+                                         write('Transporte = '),writeln(Transporte),
+                                         custoCaminhos(Caminho,Custo),write('Custo = '),writeln(Custo),
+                                         writeln(''),writeln('')  .
 multiBFSAux(Lista,_,_) :- splitBF(Lista,X,Y), multiBFSAux(X,_,_), multiBFSAux(Y,_,_).
 
 listadeRotasBFS(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
@@ -234,7 +240,10 @@ calculaRotaBFS([X,Y|T], [Z|Caminho]) :- larguraprimeiroBF(X,Y,Z,_), calculaRotaB
 %-----------------------------------------------------------------------------
 multiAP(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiAPAux(Lista, Caminho, Transporte).
 
-multiAPAux(Lista,Caminho,Transporte) :- listadeRotasAP(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiAPAux(Lista,Caminho,Transporte) :- listadeRotasAP(Lista, Caminho, Transporte),
+ write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),
+ custoCaminhos(Caminho,Custo),write('Custo = '),writeln(Custo),
+ writeln(''),writeln('').
 multiAPAux(Lista,_,_) :- splitAP(Lista,X,Y), multiAPAux(X,_,_), multiAPAux(Y,_,_).
 
 listadeRotasAP(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
@@ -250,7 +259,10 @@ calculaRotaAP([X,Y|T], [Z|Caminho]) :- aprofundamentoProgress(X,Y,Z,_), calculaR
 
 multiGreedy(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiGreedyAux(Lista, Caminho, Transporte).
 
-multiGreedyAux(Lista,Caminho,Transporte) :- listadeRotasGreedy(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiGreedyAux(Lista,Caminho,Transporte) :- listadeRotasGreedy(Lista, Caminho, Transporte), write('Caminho = '),
+                writeln(Caminho), write('Transporte = '),writeln(Transporte),
+                custoCaminhos(Caminho,Custo),write('Custo = '),writeln(Custo),
+                writeln(''),writeln('').
 multiGreedyAux(Lista,_,_) :- splitGreedy(Lista,X,Y), multiGreedyAux(X,_,_), multiGreedyAux(Y,_,_).
 
 listadeRotasGreedy(IdsEncomendas, Caminho, bicicleta) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
@@ -279,7 +291,10 @@ calculaRotaGreedy([X,Y|T], [Z|Caminho], Transporte) :- resolve_gulosa2(X,Y,Trans
 
 multiAStar(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiAStarAux(Lista, Caminho, Transporte).
 
-multiAStarAux(Lista,Caminho,Transporte) :- listadeRotasAStar(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiAStarAux(Lista,Caminho,Transporte) :- listadeRotasAStar(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho),
+         write('Transporte = '),writeln(Transporte),
+         custoCaminhos(Caminho,Custo),write('Custo = '),writeln(Custo),
+         writeln(''),writeln('')  .
 multiAStarAux(Lista,_,_) :- splitAStar(Lista,X,Y), multiAStarAux(X,_,_), multiAStarAux(Y,_,_).
 
 listadeRotasAStar(IdsEncomendas, Caminho, bicicleta) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
@@ -451,6 +466,9 @@ custo([A,B],Custo) :- move(A,B,Custo).
 custo([A,B|T],Custo) :- move(A,B,C),
         custo([B|T],NewCusto),
         Custo is NewCusto+C.  
+
+custoCaminhos([A],Custo) :- custo(A,Custo).
+custoCaminhos([A|T],Custo) :- custo(A,CustoA), custoCaminhos(T,CustoT), Custo is CustoT + CustoA.
 
 calculaTempo(carro,Peso,Distancia,Tempo) :-
     VelocidadeMedia is (25 - (0.1 * Peso)),
