@@ -57,6 +57,19 @@ ordenaPorDistanciaGreedy(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(I
 
 splitGreedy([H|T],L1,L2):-ordenaPorDistanciaGreedy(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
 
+%---------------Dividir lista AEstrela carro
+
+calcDistIdAStar(IdA,IdB,Distancia):- getFreguesia(IdA,FA), getFreguesia(IdB,FB), 
+                                      resolve_aestrela2(FA,FB,moto,5,Caminho),writeln(Caminho), %not perfect, so pra ver a distancia
+                                      custo(Caminho,Distancia). 
+                                 
+ordenaPorDistanciaAStar(IdHead, Tail , Ans) :- findall((Distancia,Id),(member(Id,Tail),calcDistIdAStar(IdHead,Id,Distancia)),List),
+                                            msort(List,Sorted),
+                                            seconds(Sorted,Ans). %so testei com o 1,3,10,11
+
+
+splitAStar([H|T],L1,L2):-ordenaPorDistanciaAStar(H,T,Lista), splitPorDistancia(H,Lista,L1,L2),!.
+
 %---------------Split Genérica
 
 splitPorDistancia(H,Lista,[H|T1],T2) :- %para esta função funcionar pra todos era fixe receber a lista já ordenada como argumento(Done)

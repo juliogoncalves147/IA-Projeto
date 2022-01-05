@@ -191,7 +191,7 @@ multiDFS(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,
 
 
 multiDFSAux(Lista,Caminho,Transporte) :- listadeRotasDFS(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
-multiDFSAux(Lista,Caminho,Transporte) :- splitDF(Lista,X,Y), multiDFSAux(X,_,_), multiDFSAux(Y,_,_).
+multiDFSAux(Lista,_,_) :- splitDF(Lista,X,Y), multiDFSAux(X,_,_), multiDFSAux(Y,_,_).
 
 
 listadeRotasDFS(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
@@ -263,6 +263,21 @@ listadeRotasGreedy(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomen
 calculaRotaGreedy([X,Y], [Caminho]) :- resolve_gulosa2(X,Y,moto,5,Caminho).
 calculaRotaGreedy([X,Y|T], [Z|Caminho]) :- resolve_gulosa2(X,Y,moto,5,Z), calculaRotaGreedy([Y|T],Caminho).
 
+%------------------AESTRELA(Várias encomendas)-----------
+
+multiAStar(Caminho,Transporte) :- solucoes(IdEncomenda, encomenda(IdEncomenda,_,_,_,_, pendente), Lista), multiAStarAux(Lista, Caminho, Transporte).
+
+multiAStarAux(Lista,Caminho,Transporte) :- listadeRotasAStar(Lista, Caminho, Transporte), write('Caminho = '),writeln(Caminho), write('Transporte = '),writeln(Transporte),writeln(''),writeln('')  .
+multiAStarAux(Lista,_,_) :- splitAStar(Lista,X,Y), multiAStarAux(X,_,_), multiAStarAux(Y,_,_).
+
+listadeRotasAStar(IdsEncomendas, Caminho, Transporte) :- ordenaPrazo(IdsEncomendas, IdsOrdenados), 
+                                                      getFreguesias(IdsOrdenados, Freguesias),
+                                                      append([centroDeRecolha],Freguesias, NewFreguesias),
+                                                      calculaRotaAStar(NewFreguesias, Caminho),
+                                                      verificaValido(IdsOrdenados, Caminho, 0, 0, Transporte).
+
+calculaRotaAStar([X,Y], [Caminho]) :- resolve_aestrela2(X,Y,moto,5,Caminho).
+calculaRotaAStar([X,Y|T], [Z|Caminho]) :- resolve_aestrela2(X,Y,moto,5,Z), calculaRotaGreedy([Y|T],Caminho).
 
 
 %---------------------------------------------------------

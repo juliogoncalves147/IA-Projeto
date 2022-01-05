@@ -9,7 +9,7 @@ resolve_aestrela2(NodoI,NodoF,carro,Peso,Caminho) :-
 resolve_aestrela2(NodoI,NodoF,moto,Peso,Caminho) :-
     Peso =< 20,
 	exactHeuristicMoto(NodoI,NodoF,Peso,EstimaKm,EstimaTmp),
-	aestrelaMoto2([[NodoF]/0/0/EstimaKm/EstimaTmp], Caminho/CustoKm/CustoTmp/_/_,NodoI,Peso).
+	aestrelaMoto2([[NodoF]/0/0/EstimaKm/EstimaTmp], Caminho/CustoKm/CustoTmp/_/_,NodoI,Peso),!.
 
 resolve_aestrela2(NodoI,NodoF,bicicleta,Peso,Caminho) :-
     Peso =< 5,
